@@ -57,6 +57,29 @@ components:
     updated_at:
      type: string
      format: date-time
+   required:
+    - id
+    - user_id
+    - content
+    - category
+    - created_at
+    - updated_at
+
+  ComplexInput:
+   type: object
+   description: 新しいコンプレックスを登録するための入力
+   properties:
+    content:
+     type: string
+     description: 言語化されたコンプレックスの内容
+     example: "人前で話すのが極度に苦手"
+    category:
+     type: string
+     description: コンプレックスのカテゴリ
+     example: "社会性・人間関係"
+   required:
+    - content
+    - category
 
   # --- GOALS, ACTIONS, BADGES, USER_BADGES のスキーマも同様に追加 ---
 
@@ -85,4 +108,57 @@ paths:
           type: string
           example: pong
 
- # --- /complexes, /goals, /actions などのエンドポイントを追加 ---
+ /complexes:
+  get:
+   summary: 登録されているコンプレックスの一覧を取得
+   tags:
+    - Complexes
+   security:
+    - BearerAuth: [] # 認証が必要な場合
+   responses:
+    "200":
+     description: コンプレックス一覧の取得成功
+     content:
+      application/json:
+       schema:
+        type: array
+        items:
+         $ref: "#/components/schemas/Complex"
+    "401":
+     description: 認証エラー
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
+    "500":
+     description: サーバー内部エラー
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
+  post:
+   summary: 新しいコンプレックスを登録
+   tags:
+    - Complexes
+   security:
+    - BearerAuth: [] # 認証が必要な場合
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/ComplexInput"
+   responses:
+    "201":
+     description: コンプレックスの登録成功
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Complex"
+    "400":
+     description: リクエスト不正 (バリデーションエラーなど)
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
+    # 401, 500エラーレスポンスも同様に追加
