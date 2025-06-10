@@ -9,7 +9,7 @@ import (
 	// "gorm.io/gorm"         // DB接続時にコメント解除
 )
 
-// リクエストバリデーション用のサンプル構造体
+// CreateUserInput : ユーザー作成リクエストのバリデーション用構造体
 type CreateUserInput struct {
 	Username string `json:"username" binding:"required,min=3,max=30"`
 	Email    string `json:"email" binding:"required,email"`
