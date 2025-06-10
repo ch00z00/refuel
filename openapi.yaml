@@ -1,0 +1,88 @@
+openapi: 3.1.0
+info:
+ title: Re:Fuel API
+ version: v1.0.0
+ description: |
+  コンプレックスを燃料に変える自己進化アプリ「Re:Fuel」のAPI仕様書です。
+  MVP（Minimum Viable Product）の機能を対象としています。
+
+servers:
+ - url: http://localhost:8080/api/v1 # 開発環境のベースURL (例)
+   description: Development server
+
+components:
+ schemas:
+  Error:
+   type: object
+   properties:
+    code:
+     type: integer
+     format: int32
+    message:
+     type: string
+   required:
+    - code
+    - message
+
+  # --- ここから各エンティティのスキーマを定義していきます ---
+  User:
+   type: object
+   properties:
+    id:
+     type: string
+     format: uuid # 例: ユーザーIDの形式
+     description: ユーザーID
+    # 他のユーザー情報 (MVPでは最小限)
+
+  Complex:
+   type: object
+   properties:
+    id:
+     type: integer
+     format: int64
+     description: コンプレックスID
+    user_id:
+     type: string
+     format: uuid
+     description: ユーザーID
+    content:
+     type: string
+     description: 言語化されたコンプレックスの内容
+    category:
+     type: string
+     description: コンプレックスのカテゴリ
+    created_at:
+     type: string
+     format: date-time
+    updated_at:
+     type: string
+     format: date-time
+
+  # --- GOALS, ACTIONS, BADGES, USER_BADGES のスキーマも同様に追加 ---
+
+ securitySchemes:
+  BearerAuth: # MVPでは認証を簡略化するかもしれませんが、将来のために定義
+   type: http
+   scheme: bearer
+   bearerFormat: JWT
+
+paths:
+ # --- ここから各エンドポイントを定義していきます ---
+ /ping:
+  get:
+   summary: サーバーの死活監視
+   tags:
+    - Health
+   responses:
+    "200":
+     description: 成功応答
+     content:
+      application/json:
+       schema:
+        type: object
+        properties:
+         message:
+          type: string
+          example: pong
+
+ # --- /complexes, /goals, /actions などのエンドポイントを追加 ---
