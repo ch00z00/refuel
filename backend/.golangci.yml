@@ -1,0 +1,33 @@
+version: "1"
+
+run:
+ timeout: 3m
+
+linters:
+ enable:
+  - errcheck
+  - gosimple
+  - govet
+  - ineffassign
+  - staticcheck
+  - typecheck
+  - unused
+  - gofmt
+  - goimports
+  # - golint # 非推奨ですが、まだ役立つ場合があります。reviveへの移行を検討してください。
+  - stylecheck
+  - bodyclose
+  - dupl
+  - exportloopref
+  - goconst
+  - gocritic
+  - lll
+  - misspell
+  - unconvert
+  - whitespace
+# TODO: Fix linters_settings
+# linters_settings:
+#  lll:
+#   line-length: 120
+#  goimports:
+#   local-prefixes: refuel/backend
