@@ -10,30 +10,37 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/mysql" // MySQL driver for migrate
-	_ "github.com/golang-migrate/migrate/v4/source/file"    // File source for migrate
+	_ "github.com/golang-migrate/migrate/v4/database/mysql"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-// Global Variables
+/* Global Variables */
 var (
 	db      *gorm.DB
 	validate *validator.Validate
 )
 
-// Models (仮定義: 実際には models/ ディレクトリなどに分離推奨)
-// OpenAPIのスキーマに基づいてGORMモデルを定義します。
-// 例:
-// type Complex struct {
-//  ID        uint      `gorm:"primarykey" json:"id"`
-//  UserID    string    `json:"user_id" gorm:"type:varchar(36);not null;index"` // UUID
-//  Content   string    `json:"content" gorm:"not null" validate:"required"`
-//  Category  string    `json:"category" gorm:"not null" validate:"required"`
-//  CreatedAt time.Time `json:"created_at"`
-//  UpdatedAt time.Time `json:"updated_at"`
-// }
+/* --- Models (実際には models/ ディレクトリなどに分離推奨) --- */
+
+// Complex represents the complex entity.
+type Complex struct {
+	ID        uint      `gorm:"primarykey" json:"id"`
+	UserID    string    `json:"user_id" gorm:"type:varchar(36);not null;index"` // UUID from AuthMiddleware
+	Content   string    `json:"content" gorm:"not null" validate:"required"`
+	Category  string    `json:"category" gorm:"not null" validate:"required"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+// ComplexInput defines the expected input for creating a new complex.
+type ComplexInput struct {
+	Content  string `json:"content" validate:"required,min=1,max=255"`
+	Category string `json:"category" validate:"required,min=1,max=100"`
+}
+
 // type Goal struct { ... }
 // type Action struct { ... }
 
@@ -70,8 +77,39 @@ func PingHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "pong"})
 }
 
-// Complex Handlers (スタブ)
-// func CreateComplexHandler(c *gin.Context) { /* ... */ }
+// CreateComplexHandler handles the creation of a new complex.
+func CreateComplexHandler(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, NewErrorResponse(http.StatusUnauthorized, "User ID not found in context"))
+		return
+	}
+
+	var input ComplexInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, NewErrorResponse(http.StatusBadRequest, "Invalid request body: "+err.Error()))
+		return
+	}
+
+	if err := validate.Struct(input); err != nil {
+		c.JSON(http.StatusBadRequest, NewErrorResponse(http.StatusBadRequest, "Validation failed: "+err.Error()))
+		return
+	}
+
+	complex := Complex{
+		UserID:   userID.(string),
+		Content:  input.Content,
+		Category: input.Category,
+	}
+
+	if result := db.Create(&complex); result.Error != nil {
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to create complex: "+result.Error.Error()))
+		return
+	}
+
+	c.JSON(http.StatusCreated, complex)
+}
+
 // func GetComplexesHandler(c *gin.Context) { /* ... */ }
 // func GetComplexHandler(c *gin.Context) { /* ... */ }
 // func UpdateComplexHandler(c *gin.Context) { /* ... */ }
@@ -186,14 +224,14 @@ func main() {
 		apiV1.GET("/ping", PingHandler)
 
 		// Complexes
-		// complexesGroup := apiV1.Group("/complexes")
-		// {
-		// 	// complexesGroup.POST("", CreateComplexHandler)
-		// 	// complexesGroup.GET("", GetComplexesHandler)
-		// 	// complexesGroup.GET("/:complexId", GetComplexHandler)
-		// 	// complexesGroup.PUT("/:complexId", UpdateComplexHandler)
-		// 	// complexesGroup.DELETE("/:complexId", DeleteComplexHandler)
-		// }
+		complexesGroup := apiV1.Group("/complexes")
+		{
+			complexesGroup.POST("", CreateComplexHandler)
+			// complexesGroup.GET("", GetComplexesHandler)
+			// complexesGroup.GET("/:complexId", GetComplexHandler)
+			// complexesGroup.PUT("/:complexId", UpdateComplexHandler)
+			// complexesGroup.DELETE("/:complexId", DeleteComplexHandler)
+		}
 
 		// Goals
 		// goalsGroup := apiV1.Group("/goals")
