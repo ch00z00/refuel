@@ -24,15 +24,13 @@ components:
     - code
     - message
 
-  # --- ここから各エンティティのスキーマを定義していきます ---
   User:
    type: object
    properties:
     id:
      type: string
-     format: uuid # 例: ユーザーIDの形式
+     format: uuid
      description: ユーザーID
-    # 他のユーザー情報 (MVPでは最小限)
 
   Complex:
    type: object
@@ -81,7 +79,165 @@ components:
     - content
     - category
 
-  # --- GOALS, ACTIONS, BADGES, USER_BADGES のスキーマも同様に追加 ---
+  Goal:
+   type: object
+   properties:
+    id:
+     type: integer
+     format: int64
+     description: 目標ID
+    user_id:
+     type: string
+     format: uuid
+     description: ユーザーID
+    complex_id:
+     type: integer
+     format: int64
+     description: 関連するコンプレックスID
+    surface_goal:
+     type: string
+     description: 表目標の内容
+    underlying_goal:
+     type: string
+     description: 裏目標の内容
+    created_at:
+     type: string
+     format: date-time
+    updated_at:
+     type: string
+     format: date-time
+   required:
+    - id
+    - user_id
+    - complex_id
+    - surface_goal
+    - underlying_goal
+    - created_at
+    - updated_at
+
+  GoalInput:
+   type: object
+   description: 新しい目標を登録するための入力
+   properties:
+    complex_id:
+     type: integer
+     format: int64
+     description: 関連するコンプレックスID
+     example: 1
+    surface_goal:
+     type: string
+     description: 表目標の内容
+     example: "会議で週に一度は発言する"
+    underlying_goal:
+     type: string
+     description: 裏目標の内容
+     example: "自分の意見に自信を持つ"
+   required:
+    - complex_id
+    - surface_goal
+    - underlying_goal
+
+  Action:
+   type: object
+   properties:
+    id:
+     type: integer
+     format: int64
+     description: 行動ID
+    user_id:
+     type: string
+     format: uuid
+     description: ユーザーID
+    goal_id:
+     type: integer
+     format: int64
+     description: 関連する目標ID
+    content:
+     type: string
+     description: 行動の内容
+    completed_at:
+     type: string
+     format: date-time
+     nullable: true
+     description: 行動完了日時 (未完了の場合はnull)
+    created_at:
+     type: string
+     format: date-time
+    updated_at:
+     type: string
+     format: date-time
+   required:
+    - id
+    - user_id
+    - goal_id
+    - content
+    - created_at
+    - updated_at
+
+  ActionInput:
+   type: object
+   description: 新しい行動を記録するための入力
+   properties:
+    goal_id:
+     type: integer
+     format: int64
+     description: 関連する目標ID
+     example: 1
+    content:
+     type: string
+     description: 行動の内容
+     example: "今日のチームミーティングで意見を一つ述べた"
+    completed_at:
+     type: string
+     format: date-time
+     nullable: true
+     description: 行動完了日時 (記録時に完了していれば設定)
+     example: "2023-10-27T10:30:00Z"
+   required:
+    - goal_id
+    - content
+
+  Badge:
+   type: object
+   properties:
+    id:
+     type: integer
+     format: int64
+     description: バッジID
+    name:
+     type: string
+     description: バッジ名
+    description:
+     type: string
+     description: バッジの説明
+    icon_url:
+     type: string
+     format: url
+     nullable: true
+     description: バッジアイコンのURL
+   required:
+    - id
+    - name
+    - description
+
+  UserBadge:
+   type: object
+   description: ユーザーが獲得したバッジの情報
+   properties:
+    user_id:
+     type: string
+     format: uuid
+     description: ユーザーID
+    badge:
+     $ref: "#/components/schemas/Badge"
+    achieved_at:
+     type: string
+     format: date-time
+     description: バッジ獲得日時
+   required:
+    - user_id
+    - badge
+    - achieved_at
 
  securitySchemes:
   BearerAuth:
@@ -92,6 +248,12 @@ components:
 tags:
  - name: Complexes
    description: Operations related to user complexes
+ - name: Goals
+   description: Operations related to user goals
+ - name: Actions
+   description: Operations related to user actions
+ - name: Badges
+   description: Operations related to badges
 
 paths:
  /ping:
@@ -196,6 +358,212 @@ paths:
      description: 指定されたコンプレックスが見つかりません。
     "500":
      description: サーバー内部エラー。
+
+ /goals:
+  get:
+   summary: 登録されている目標の一覧を取得
+   tags:
+    - Goals
+   security:
+    - BearerAuth: []
+   responses:
+    "200":
+     description: 目標一覧の取得成功
+     content:
+      application/json:
+       schema:
+        type: array
+        items:
+         $ref: "#/components/schemas/Goal"
+    "401":
+     description: 認証エラー
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
+    "500":
+     description: サーバー内部エラー
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
+  post:
+   summary: 新しい目標を登録
+   tags:
+    - Goals
+   security:
+    - BearerAuth: []
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/GoalInput"
+   responses:
+    "201":
+     description: 目標の登録成功
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Goal"
+    "400":
+     description: リクエスト不正 (バリデーションエラーなど)
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
+    "401":
+     description: 認証エラー
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
+    "500":
+     description: サーバー内部エラー
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
+
+ /goals/{goalId}:
+  parameters:
+   - name: goalId
+     in: path
+     required: true
+     description: 操作対象の目標ID
+     schema:
+      type: integer
+      format: int64
+      example: 1
+  get:
+   summary: 指定されたIDの目標情報を取得
+   tags:
+    - Goals
+   security:
+    - BearerAuth: []
+   responses:
+    "200":
+     description: 目標情報の取得成功
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Goal"
+    "401":
+     description: 認証エラー
+    "404":
+     description: 指定された目標が見つかりません
+    "500":
+     description: サーバー内部エラー
+  put:
+   summary: 既存の目標情報を更新
+   tags:
+    - Goals
+   security:
+    - BearerAuth: []
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/GoalInput" # 更新時も同じ入力形式を想定
+   responses:
+    "200":
+     description: 目標の更新成功
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Goal"
+    "400":
+     description: リクエスト不正
+    "401":
+     description: 認証エラー
+    "404":
+     description: 指定された目標が見つかりません
+    "500":
+     description: サーバー内部エラー
+  delete:
+   summary: 既存の目標を削除
+   tags:
+    - Goals
+   security:
+    - BearerAuth: []
+   responses:
+    "204":
+     description: 目標の削除成功
+    "401":
+     description: 認証エラー
+    "404":
+     description: 指定された目標が見つかりません
+    "500":
+     description: サーバー内部エラー
+
+ /actions:
+  post:
+   summary: 新しい行動を記録
+   tags:
+    - Actions
+   security:
+    - BearerAuth: []
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/ActionInput"
+   responses:
+    "201":
+     description: 行動の記録成功
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Action"
+    "400":
+     description: リクエスト不正
+    "401":
+     description: 認証エラー
+    "500":
+     description: サーバー内部エラー
+ # GET /actions は要件に応じてフィルタリングパラメータ（例: goal_id, user_id, date_range）を追加検討
+
+ /badges:
+  get:
+   summary: 利用可能なバッジの一覧を取得
+   tags:
+    - Badges
+   # security: # バッジ一覧は認証なしでも見れるようにするか検討。今回は認証必須とする
+   #  - BearerAuth: []
+   responses:
+    "200":
+     description: バッジ一覧の取得成功
+     content:
+      application/json:
+       schema:
+        type: array
+        items:
+         $ref: "#/components/schemas/Badge"
+    "500":
+     description: サーバー内部エラー
+
+ /me/badges:
+  get:
+   summary: 認証ユーザーが獲得したバッジの一覧を取得
+   tags:
+    - Badges # UserBadges タグでも良い
+   security:
+    - BearerAuth: []
+   responses:
+    "200":
+     description: 獲得バッジ一覧の取得成功
+     content:
+      application/json:
+       schema:
+        type: array
+        items:
+         $ref: "#/components/schemas/UserBadge"
+    "401":
+     description: 認証エラー
+    "500":
+     description: サーバー内部エラー
   put:
    summary: 既存のコンプレックス情報を更新します。
    requestBody:
