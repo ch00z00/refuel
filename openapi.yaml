@@ -84,13 +84,16 @@ components:
   # --- GOALS, ACTIONS, BADGES, USER_BADGES のスキーマも同様に追加 ---
 
  securitySchemes:
-  BearerAuth: # MVPでは認証を簡略化するかもしれませんが、将来のために定義
+  BearerAuth:
    type: http
    scheme: bearer
    bearerFormat: JWT
 
+tags:
+ - name: Complexes
+   description: Operations related to user complexes
+
 paths:
- # --- ここから各エンドポイントを定義していきます ---
  /ping:
   get:
    summary: サーバーの死活監視
@@ -114,7 +117,7 @@ paths:
    tags:
     - Complexes
    security:
-    - BearerAuth: [] # 認証が必要な場合
+    - BearerAuth: []
    responses:
     "200":
      description: コンプレックス一覧の取得成功
@@ -141,7 +144,7 @@ paths:
    tags:
     - Complexes
    security:
-    - BearerAuth: [] # 認証が必要な場合
+    - BearerAuth: []
    requestBody:
     required: true
     content:
@@ -161,4 +164,65 @@ paths:
       application/json:
        schema:
         $ref: "#/components/schemas/Error"
-    # 401, 500エラーレスポンスも同様に追加
+    "500":
+     description: サーバー内部エラー
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
+
+ /complexes/{complexId}:
+  parameters:
+   - name: complexId
+     in: path
+     required: true
+     description: 操作対象のコンプレックスID
+     schema:
+      type: string
+      format: uuid
+      example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  get:
+   summary: 指定されたIDのコンプレックス情報を取得します。
+   tags:
+    - Complexes
+   responses:
+    "200":
+     description: コンプレックス情報が正常に取得されました。
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Complex"
+    "404":
+     description: 指定されたコンプレックスが見つかりません。
+    "500":
+     description: サーバー内部エラー。
+  put:
+   summary: 既存のコンプレックス情報を更新します。
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/ComplexInput"
+   responses:
+    "200":
+     description: コンプレックスが正常に更新されました。
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Complex"
+    "400":
+     description: リクエストが不正です。
+    "404":
+     description: 指定されたコンプレックスが見つかりません。
+    "500":
+     description: サーバー内部エラー。
+  delete:
+   summary: 既存のコンプレックスを削除します。
+   responses:
+    "204":
+     description: コンプレックスが正常に削除されました。
+    "404":
+     description: 指定されたコンプレックスが見つかりません。
+    "500":
+     description: サーバー内部エラー。
