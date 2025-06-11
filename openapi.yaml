@@ -254,6 +254,8 @@ tags:
    description: Operations related to user actions
  - name: Badges
    description: Operations related to badges
+ - name: Health
+   description: API health check
 
 paths:
  /ping:
@@ -340,13 +342,15 @@ paths:
      required: true
      description: 操作対象のコンプレックスID
      schema:
-      type: string
-      format: uuid
-      example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+      type: integer
+      format: int64
+      example: 1
   get:
    summary: 指定されたIDのコンプレックス情報を取得します。
    tags:
     - Complexes
+   security:
+    - BearerAuth: []
    responses:
     "200":
      description: コンプレックス情報が正常に取得されました。
@@ -354,10 +358,70 @@ paths:
       application/json:
        schema:
         $ref: "#/components/schemas/Complex"
+   "401":
+    description: 認証エラー
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/Error"
     "404":
      description: 指定されたコンプレックスが見つかりません。
     "500":
-     description: サーバー内部エラー。
+     description: サーバー内部エラー
+  put:
+   summary: 既存のコンプレックス情報を更新します。
+   tags:
+    - Complexes
+   security:
+    - BearerAuth: []
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/ComplexInput"
+   responses:
+    "200":
+     description: コンプレックスが正常に更新されました。
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Complex"
+    "400":
+     description: リクエストが不正です。
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/Error"
+   "401":
+    description: 認証エラー
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/Error"
+    "404":
+     description: 指定されたコンプレックスが見つかりません。
+    "500":
+     description: サーバー内部エラー
+  delete:
+   summary: 既存のコンプレックスを削除します。
+   tags:
+    - Complexes
+   security:
+    - BearerAuth: []
+   responses:
+    "204":
+     description: コンプレックスが正常に削除されました。
+   "401":
+    description: 認証エラー
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/Error"
+    "404":
+     description: 指定されたコンプレックスが見つかりません。
+    "500":
+     description: サーバー内部エラー
 
  /goals:
   get:
@@ -448,8 +512,18 @@ paths:
       application/json:
        schema:
         $ref: "#/components/schemas/Goal"
+   "400":
+    description: リクエスト不正 (バリデーションエラーなど)
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/Error"
     "401":
      description: 認証エラー
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
     "404":
      description: 指定された目標が見つかりません
     "500":
@@ -475,8 +549,16 @@ paths:
         $ref: "#/components/schemas/Goal"
     "400":
      description: リクエスト不正
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
     "401":
      description: 認証エラー
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
     "404":
      description: 指定された目標が見つかりません
     "500":
@@ -492,6 +574,10 @@ paths:
      description: 目標の削除成功
     "401":
      description: 認証エラー
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
     "404":
      description: 指定された目標が見つかりません
     "500":
@@ -519,10 +605,22 @@ paths:
         $ref: "#/components/schemas/Action"
     "400":
      description: リクエスト不正
-    "401":
-     description: 認証エラー
-    "500":
-     description: サーバー内部エラー
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/Error"
+   "401":
+    description: 認証エラー
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/Error"
+   "500":
+    description: サーバー内部エラー
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/Error"
  # GET /actions は要件に応じてフィルタリングパラメータ（例: goal_id, user_id, date_range）を追加検討
 
  /badges:
@@ -543,6 +641,10 @@ paths:
          $ref: "#/components/schemas/Badge"
     "500":
      description: サーバー内部エラー
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
 
  /me/badges:
   get:
@@ -562,35 +664,13 @@ paths:
          $ref: "#/components/schemas/UserBadge"
     "401":
      description: 認証エラー
-    "500":
-     description: サーバー内部エラー
-  put:
-   summary: 既存のコンプレックス情報を更新します。
-   requestBody:
-    required: true
     content:
      application/json:
       schema:
-       $ref: "#/components/schemas/ComplexInput"
-   responses:
-    "200":
-     description: コンプレックスが正常に更新されました。
-     content:
-      application/json:
-       schema:
-        $ref: "#/components/schemas/Complex"
-    "400":
-     description: リクエストが不正です。
-    "404":
-     description: 指定されたコンプレックスが見つかりません。
-    "500":
-     description: サーバー内部エラー。
-  delete:
-   summary: 既存のコンプレックスを削除します。
-   responses:
-    "204":
-     description: コンプレックスが正常に削除されました。
-    "404":
-     description: 指定されたコンプレックスが見つかりません。
-    "500":
-     description: サーバー内部エラー。
+       $ref: "#/components/schemas/Error"
+   "500":
+    description: サーバー内部エラー
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/Error"
