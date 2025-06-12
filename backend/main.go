@@ -41,8 +41,30 @@ type ComplexInput struct {
 	Category string `json:"category" validate:"required,min=1,max=100"`
 }
 
-// type Goal struct { ... }
+// Goal represents the goal entity.
+type Goal struct {
+	ID             uint      `gorm:"primarykey" json:"id"`
+	UserID         string    `json:"user_id" gorm:"type:varchar(36);not null;index"`
+	ComplexID      uint      `json:"complex_id" gorm:"not null;index"` // Foreign key to Complex
+	SurfaceGoal    string    `json:"surface_goal" gorm:"not null"`
+	UnderlyingGoal string    `json:"underlying_goal" gorm:"not null"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+	Complex        Complex   `gorm:"foreignKey:ComplexID"` // Belongs to Complex
+}
+
+// GoalInput defines the expected input for creating or updating a goal.
+type GoalInput struct {
+	ComplexID      uint   `json:"complex_id" validate:"required"`
+	SurfaceGoal    string `json:"surface_goal" validate:"required,min=1,max=255"`
+	UnderlyingGoal string `json:"underlying_goal" validate:"required,min=1,max=255"`
+}
+
 // type Action struct { ... }
+
+// --- GORM AutoMigrate Helper ---
+// (This can be moved to a more appropriate place like a db setup function later)
+var modelsToMigrate = []interface{}{&Complex{}, &Goal{}} // Add &Action{} later
 
 // ErrorResponse Helper
 type ErrorResponse struct {
@@ -212,12 +234,144 @@ func DeleteComplexHandler(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// Goal Handlers (スタブ)
-// func CreateGoalHandler(c *gin.Context) { /* ... */ }
-// func GetGoalsHandler(c *gin.Context) { /* ... */ }
-// func GetGoalHandler(c *gin.Context) { /* ... */ }
-// func UpdateGoalHandler(c *gin.Context) { /* ... */ }
-// func DeleteGoalHandler(c *gin.Context) { /* ... */ }
+// CreateGoalHandler handles the creation of a new goal.
+func CreateGoalHandler(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, NewErrorResponse(http.StatusUnauthorized, "User ID not found in context"))
+		return
+	}
+
+	var input GoalInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, NewErrorResponse(http.StatusBadRequest, "Invalid request body: "+err.Error()))
+		return
+	}
+
+	if err := validate.Struct(input); err != nil {
+		c.JSON(http.StatusBadRequest, NewErrorResponse(http.StatusBadRequest, "Validation failed: "+err.Error()))
+		return
+	}
+
+	// Check if the referenced complex exists and belongs to the user
+	var complex Complex
+	if err := db.Where("id = ? AND user_id = ?", input.ComplexID, userID.(string)).First(&complex).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusBadRequest, NewErrorResponse(http.StatusBadRequest, "Referenced complex not found or does not belong to user"))
+			return
+		}
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Error checking complex: "+err.Error()))
+		return
+	}
+
+	goal := Goal{
+		UserID:         userID.(string),
+		ComplexID:      input.ComplexID,
+		SurfaceGoal:    input.SurfaceGoal,
+		UnderlyingGoal: input.UnderlyingGoal,
+	}
+
+	if result := db.Create(&goal); result.Error != nil {
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to create goal: "+result.Error.Error()))
+		return
+	}
+
+	c.JSON(http.StatusCreated, goal)
+}
+
+// GetGoalsHandler handles fetching all goals for the authenticated user.
+func GetGoalsHandler(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, NewErrorResponse(http.StatusUnauthorized, "User ID not found in context"))
+		return
+	}
+
+	var goals []Goal
+	if result := db.Where("user_id = ?", userID.(string)).Find(&goals); result.Error != nil {
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to fetch goals: "+result.Error.Error()))
+		return
+	}
+
+	if goals == nil {
+		goals = []Goal{}
+	}
+	c.JSON(http.StatusOK, goals)
+}
+
+// GetGoalHandler handles fetching a specific goal by its ID.
+func GetGoalHandler(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, NewErrorResponse(http.StatusUnauthorized, "User ID not found in context"))
+		return
+	}
+	goalID := c.Param("goalId")
+
+	var goal Goal
+	if err := db.Where("id = ? AND user_id = ?", goalID, userID.(string)).First(&goal).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, NewErrorResponse(http.StatusNotFound, "Goal not found"))
+			return
+		}
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to fetch goal: "+err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, goal)
+}
+
+// UpdateGoalHandler handles updating an existing goal.
+func UpdateGoalHandler(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, NewErrorResponse(http.StatusUnauthorized, "User ID not found in context"))
+		return
+	}
+	goalID := c.Param("goalId")
+
+	var input GoalInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, NewErrorResponse(http.StatusBadRequest, "Invalid request body: "+err.Error()))
+		return
+	}
+	if err := validate.Struct(input); err != nil {
+		c.JSON(http.StatusBadRequest, NewErrorResponse(http.StatusBadRequest, "Validation failed: "+err.Error()))
+		return
+	}
+
+	var goal Goal
+	if err := db.Where("id = ? AND user_id = ?", goalID, userID.(string)).First(&goal).Error; err != nil {
+		c.JSON(http.StatusNotFound, NewErrorResponse(http.StatusNotFound, "Goal not found to update"))
+		return
+	}
+
+	// Note: ComplexID update is not allowed here for simplicity, but can be added if needed.
+	// If ComplexID is updated, ensure the new ComplexID also belongs to the user.
+	goal.SurfaceGoal = input.SurfaceGoal
+	goal.UnderlyingGoal = input.UnderlyingGoal
+
+	if err := db.Save(&goal).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to update goal: "+err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, goal)
+}
+
+// DeleteGoalHandler handles deleting a goal by its ID.
+func DeleteGoalHandler(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, NewErrorResponse(http.StatusUnauthorized, "User ID not found in context"))
+		return
+	}
+	goalID := c.Param("goalId")
+
+	if result := db.Where("id = ? AND user_id = ?", goalID, userID.(string)).Delete(&Goal{}); result.Error != nil || result.RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, NewErrorResponse(http.StatusNotFound, "Goal not found or already deleted"))
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
 
 // Action Handlers (スタブ)
 // func CreateActionHandler(c *gin.Context) { /* ... */ }
@@ -299,8 +453,8 @@ func main() {
 	} else {
 		log.Println("ℹ️ MIGRATION_PATH not set, skipping automated migrations. Ensure DB schema is up to date.")
 		// 開発初期段階ではGORMのAutoMigrateも便利です
-		// log.Println("Running GORM AutoMigrate for initial schema setup...")
-		// db.AutoMigrate(&Complex{}, &Goal{}, &Action{}) // ここにモデルを追加
+		log.Println("Running GORM AutoMigrate for initial schema setup...")
+		db.AutoMigrate(modelsToMigrate...) // Use the slice for AutoMigrate
 	}
 
 	// --- Ginルーターの初期化 ---
@@ -331,14 +485,14 @@ func main() {
 		}
 
 		// Goals
-		// goalsGroup := apiV1.Group("/goals")
-		// {
-		// 	// goalsGroup.POST("", CreateGoalHandler)
-		// 	// goalsGroup.GET("", GetGoalsHandler)
-		// 	// goalsGroup.GET("/:goalId", GetGoalHandler)
-		// 	// goalsGroup.PUT("/:goalId", UpdateGoalHandler)
-		// 	// goalsGroup.DELETE("/:goalId", DeleteGoalHandler)
-		// }
+		goalsGroup := apiV1.Group("/goals")
+		{
+			goalsGroup.POST("", CreateGoalHandler)
+			goalsGroup.GET("", GetGoalsHandler)
+			goalsGroup.GET("/:goalId", GetGoalHandler)
+			goalsGroup.PUT("/:goalId", UpdateGoalHandler)
+			goalsGroup.DELETE("/:goalId", DeleteGoalHandler)
+		}
 
 		// Actions
 		// actionsGroup := apiV1.Group("/actions")
