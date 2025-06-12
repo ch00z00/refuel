@@ -29,12 +29,11 @@ services:
    db:
     condition: service_healthy
   environment:
-   # DB接続情報は適宜変更してください
-   - DB_HOST=db
-   - DB_PORT=3306
-   - DB_USER=refuel_user
-   - DB_PASSWORD=refuel_password
-   - DB_NAME=refuel_db
+   - DB_HOST=${DB_HOST}
+   - DB_PORT=${DB_PORT}
+   - DB_USER=${DB_USER}
+   - DB_PASSWORD=${DB_PASSWORD}
+   - DB_NAME=${DB_NAME}
   networks:
    - refuel_network
 
@@ -43,10 +42,10 @@ services:
   ports:
    - "3306:3306"
   environment:
-   MYSQL_ROOT_PASSWORD: root_password
-   MYSQL_DATABASE: refuel_db
-   MYSQL_USER: refuel_user
-   MYSQL_PASSWORD: refuel_password
+   MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+   MYSQL_DATABASE: ${MYSQL_DATABASE}
+   MYSQL_USER: ${MYSQL_USER}
+   MYSQL_PASSWORD: ${MYSQL_PASSWORD}
   volumes:
    - mysql_data:/var/lib/mysql
    # 初期マイグレーションファイルがある場合: - ./backend/migrations:/docker-entrypoint-initdb.d

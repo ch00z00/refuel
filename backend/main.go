@@ -110,7 +110,27 @@ func CreateComplexHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, complex)
 }
 
-// func GetComplexesHandler(c *gin.Context) { /* ... */ }
+// GetComplexesHandler handles fetching all complexes for the authenticated user.
+func GetComplexesHandler(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, NewErrorResponse(http.StatusUnauthorized, "User ID not found in context"))
+		return
+	}
+
+	var complexes []Complex
+	if result := db.Where("user_id = ?", userID.(string)).Find(&complexes); result.Error != nil {
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to fetch complexes: "+result.Error.Error()))
+		return
+	}
+
+	if complexes == nil { // ユーザーに紐づくコンプレックスが存在しない場合も空配列を返す
+		complexes = []Complex{}
+	}
+
+	c.JSON(http.StatusOK, complexes)
+}
+
 // func GetComplexHandler(c *gin.Context) { /* ... */ }
 // func UpdateComplexHandler(c *gin.Context) { /* ... */ }
 // func DeleteComplexHandler(c *gin.Context) { /* ... */ }
@@ -227,7 +247,7 @@ func main() {
 		complexesGroup := apiV1.Group("/complexes")
 		{
 			complexesGroup.POST("", CreateComplexHandler)
-			// complexesGroup.GET("", GetComplexesHandler)
+			complexesGroup.GET("", GetComplexesHandler)
 			// complexesGroup.GET("/:complexId", GetComplexHandler)
 			// complexesGroup.PUT("/:complexId", UpdateComplexHandler)
 			// complexesGroup.DELETE("/:complexId", DeleteComplexHandler)
