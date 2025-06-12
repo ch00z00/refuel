@@ -131,9 +131,86 @@ func GetComplexesHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, complexes)
 }
 
-// func GetComplexHandler(c *gin.Context) { /* ... */ }
-// func UpdateComplexHandler(c *gin.Context) { /* ... */ }
-// func DeleteComplexHandler(c *gin.Context) { /* ... */ }
+// GetComplexHandler handles fetching a specific complex by its ID.
+func GetComplexHandler(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, NewErrorResponse(http.StatusUnauthorized, "User ID not found in context"))
+		return
+	}
+
+	complexID := c.Param("complexId")
+
+	var complex Complex
+	if result := db.Where("id = ? AND user_id = ?", complexID, userID.(string)).First(&complex); result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, NewErrorResponse(http.StatusNotFound, "Complex not found"))
+			return
+		}
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to fetch complex: "+result.Error.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, complex)
+}
+
+// UpdateComplexHandler handles updating an existing complex.
+func UpdateComplexHandler(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, NewErrorResponse(http.StatusUnauthorized, "User ID not found in context"))
+		return
+	}
+
+	complexID := c.Param("complexId")
+
+	var input ComplexInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, NewErrorResponse(http.StatusBadRequest, "Invalid request body: "+err.Error()))
+		return
+	}
+
+	if err := validate.Struct(input); err != nil {
+		c.JSON(http.StatusBadRequest, NewErrorResponse(http.StatusBadRequest, "Validation failed: "+err.Error()))
+		return
+	}
+
+	var complex Complex
+	if result := db.Where("id = ? AND user_id = ?", complexID, userID.(string)).First(&complex); result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, NewErrorResponse(http.StatusNotFound, "Complex not found to update"))
+			return
+		}
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to find complex to update: "+result.Error.Error()))
+		return
+	}
+
+	complex.Content = input.Content
+	complex.Category = input.Category
+
+	if result := db.Save(&complex); result.Error != nil {
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to update complex: "+result.Error.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, complex)
+}
+
+// DeleteComplexHandler handles deleting a complex by its ID.
+func DeleteComplexHandler(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, NewErrorResponse(http.StatusUnauthorized, "User ID not found in context"))
+		return
+	}
+	complexID := c.Param("complexId")
+
+	if result := db.Where("id = ? AND user_id = ?", complexID, userID.(string)).Delete(&Complex{}); result.Error != nil || result.RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, NewErrorResponse(http.StatusNotFound, "Complex not found or already deleted"))
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
 
 // Goal Handlers (スタブ)
 // func CreateGoalHandler(c *gin.Context) { /* ... */ }
@@ -248,9 +325,9 @@ func main() {
 		{
 			complexesGroup.POST("", CreateComplexHandler)
 			complexesGroup.GET("", GetComplexesHandler)
-			// complexesGroup.GET("/:complexId", GetComplexHandler)
-			// complexesGroup.PUT("/:complexId", UpdateComplexHandler)
-			// complexesGroup.DELETE("/:complexId", DeleteComplexHandler)
+			complexesGroup.GET("/:complexId", GetComplexHandler)
+			complexesGroup.PUT("/:complexId", UpdateComplexHandler)
+			complexesGroup.DELETE("/:complexId", DeleteComplexHandler)
 		}
 
 		// Goals
