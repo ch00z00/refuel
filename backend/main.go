@@ -60,11 +60,28 @@ type GoalInput struct {
 	UnderlyingGoal string `json:"underlying_goal" validate:"required,min=1,max=255"`
 }
 
-// type Action struct { ... }
+// Action represents the action entity.
+type Action struct {
+	ID          uint       `gorm:"primarykey" json:"id"`
+	UserID      string     `json:"user_id" gorm:"type:varchar(36);not null;index"`
+	GoalID      uint       `json:"goal_id" gorm:"not null;index"` // Foreign key to Goal
+	Content     string     `json:"content" gorm:"not null"`
+	CompletedAt *time.Time `json:"completed_at,omitempty"` // Pointer to allow null
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+	Goal        Goal       `gorm:"foreignKey:GoalID"` // Belongs to Goal
+}
+
+// ActionInput defines the expected input for creating a new action.
+type ActionInput struct {
+	GoalID      uint   `json:"goal_id" validate:"required"`
+	Content     string `json:"content" validate:"required,min=1,max=1000"`
+	CompletedAt string `json:"completed_at,omitempty" validate:"omitempty,datetime=2006-01-02T15:04:05Z07:00"` // ISO8601 format
+}
 
 // --- GORM AutoMigrate Helper ---
 // (This can be moved to a more appropriate place like a db setup function later)
-var modelsToMigrate = []interface{}{&Complex{}, &Goal{}} // Add &Action{} later
+var modelsToMigrate = []interface{}{&Complex{}, &Goal{}, &Action{}}
 
 // ErrorResponse Helper
 type ErrorResponse struct {
@@ -373,8 +390,59 @@ func DeleteGoalHandler(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// Action Handlers (スタブ)
-// func CreateActionHandler(c *gin.Context) { /* ... */ }
+// CreateActionHandler handles the creation of a new action.
+func CreateActionHandler(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, NewErrorResponse(http.StatusUnauthorized, "User ID not found in context"))
+		return
+	}
+
+	var input ActionInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, NewErrorResponse(http.StatusBadRequest, "Invalid request body: "+err.Error()))
+		return
+	}
+
+	if err := validate.Struct(input); err != nil {
+		c.JSON(http.StatusBadRequest, NewErrorResponse(http.StatusBadRequest, "Validation failed: "+err.Error()))
+		return
+	}
+
+	// Check if the referenced goal exists and belongs to the user
+	var goal Goal
+	if err := db.Where("id = ? AND user_id = ?", input.GoalID, userID.(string)).First(&goal).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusBadRequest, NewErrorResponse(http.StatusBadRequest, "Referenced goal not found or does not belong to user"))
+			return
+		}
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Error checking goal: "+err.Error()))
+		return
+	}
+
+	var completedAtParsed *time.Time
+	if input.CompletedAt != "" {
+		t, err := time.Parse(time.RFC3339, input.CompletedAt)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, NewErrorResponse(http.StatusBadRequest, "Invalid completed_at format. Use ISO8601 (RFC3339)."))
+			return
+		}
+		completedAtParsed = &t
+	}
+
+	action := Action{
+		UserID:      userID.(string),
+		GoalID:      input.GoalID,
+		Content:     input.Content,
+		CompletedAt: completedAtParsed,
+	}
+
+	if result := db.Create(&action); result.Error != nil {
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to create action: "+result.Error.Error()))
+		return
+	}
+	c.JSON(http.StatusCreated, action)
+}
 
 func main() {
 	// --- 環境変数からの設定読み込み (例) ---
@@ -495,10 +563,10 @@ func main() {
 		}
 
 		// Actions
-		// actionsGroup := apiV1.Group("/actions")
-		// {
-		// 	// actionsGroup.POST("", CreateActionHandler)
-		// }
+		actionsGroup := apiV1.Group("/actions")
+		{
+			actionsGroup.POST("", CreateActionHandler)
+		}
 	}
 
 	// --- サーバー起動 ---
