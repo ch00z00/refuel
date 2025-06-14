@@ -444,6 +444,43 @@ func CreateActionHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, action)
 }
 
+// GetActionsHandler handles fetching all actions for a specific goal of the authenticated user.
+func GetActionsHandler(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, NewErrorResponse(http.StatusUnauthorized, "User ID not found in context"))
+		return
+	}
+
+	goalIDStr := c.Query("goal_id")
+	if goalIDStr == "" {
+		c.JSON(http.StatusBadRequest, NewErrorResponse(http.StatusBadRequest, "Query parameter 'goal_id' is required"))
+		return
+	}
+
+	// Ensure the goal belongs to the user to prevent fetching actions for other users' goals
+	var goal Goal
+	if err := db.Where("id = ? AND user_id = ?", goalIDStr, userID.(string)).First(&goal).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, NewErrorResponse(http.StatusNotFound, "Goal not found or does not belong to user"))
+			return
+		}
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Error verifying goal: "+err.Error()))
+		return
+	}
+
+	var actions []Action
+	if result := db.Where("goal_id = ? AND user_id = ?", goalIDStr, userID.(string)).Order("created_at DESC").Find(&actions); result.Error != nil {
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to fetch actions: "+result.Error.Error()))
+		return
+	}
+
+	if actions == nil {
+		actions = []Action{}
+	}
+	c.JSON(http.StatusOK, actions)
+}
+
 func main() {
 	// --- 環境変数からの設定読み込み (例) ---
 	dbUser := os.Getenv("DB_USER")
@@ -566,6 +603,7 @@ func main() {
 		actionsGroup := apiV1.Group("/actions")
 		{
 			actionsGroup.POST("", CreateActionHandler)
+			actionsGroup.GET("", GetActionsHandler)
 		}
 	}
 
