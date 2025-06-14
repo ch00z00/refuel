@@ -12,8 +12,11 @@ const ListWrapper = styled.div`
 
 interface ComplexListProps {
   complexes: Complex[];
+  // eslint-disable-next-line no-unused-vars
   onViewGoals: (id: number) => void;
+  // eslint-disable-next-line no-unused-vars
   onEdit: (id: number) => void;
+  // eslint-disable-next-line no-unused-vars
   onDelete: (id: number) => void;
   onAddNewComplex: () => void; // For NoComplexesMessage
 }
