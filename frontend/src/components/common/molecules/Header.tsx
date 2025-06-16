@@ -16,11 +16,11 @@ const HeaderWrapper = styled.header`
 const NavContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem; /* 16px */
+  padding: 0 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 4rem; /* 64px */
+  height: 4rem;
 `;
 
 const Logo = styled.h1`
@@ -49,11 +49,14 @@ const Header: React.FC<HeaderProps> = ({ onAddNewComplex }) => {
   return (
     <HeaderWrapper>
       <NavContainer>
-        <Logo>{t('headerTitle')}</Logo>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Button variant="primary" size="small" onClick={onAddNewComplex}>
-            {t('addNewComplexButton')}
-          </Button>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem',
+          }}
+        >
+          <Logo>{t('headerTitle')}</Logo>
           <LanguageSwitcher>
             <Button
               size="small"
@@ -72,6 +75,11 @@ const Header: React.FC<HeaderProps> = ({ onAddNewComplex }) => {
               EN
             </Button>
           </LanguageSwitcher>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Button variant="primary" size="small" onClick={onAddNewComplex}>
+            + {t('addNewComplexButton')}
+          </Button>
         </div>
       </NavContainer>
     </HeaderWrapper>

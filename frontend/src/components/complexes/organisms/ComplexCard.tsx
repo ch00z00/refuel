@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 import type { Complex } from '../../../types/complex';
 import Button from '../../common/atoms/Button';
 
@@ -88,6 +89,7 @@ const ComplexCard: React.FC<ComplexCardProps> = ({
   onDelete,
   animationDelay,
 }) => {
+  const { t } = useTranslation();
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
       year: 'numeric',
@@ -104,7 +106,10 @@ const ComplexCard: React.FC<ComplexCardProps> = ({
         <ContentText>{complex.content}</ContentText>
       </div>
       <div>
-        <MetaText>最終更新: {formatDate(complex.updated_at)}</MetaText>
+        <MetaText>
+          {t('lastUpdated')}
+          {formatDate(complex.updated_at)}
+        </MetaText>
         <ActionsWrapper>
           <Button
             variant="primary"
@@ -112,21 +117,21 @@ const ComplexCard: React.FC<ComplexCardProps> = ({
             onClick={() => onViewGoals(complex.id)}
             style={{ flexGrow: 1 }}
           >
-            目標を見る/設定
+            {t('viewSetGoalsButton')}
           </Button>
           <Button
             variant="secondary"
             size="small"
             onClick={() => onEdit(complex.id)}
           >
-            編集
+            {t('editButton')}
           </Button>
           <Button
             variant="danger"
             size="small"
             onClick={() => onDelete(complex.id)}
           >
-            削除
+            {t('deleteButton')}
           </Button>
         </ActionsWrapper>
       </div>
