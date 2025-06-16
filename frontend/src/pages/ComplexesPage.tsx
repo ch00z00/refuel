@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -42,7 +42,7 @@ const PageSubtitle = styled.p`
 `;
 
 import Button from '../components/common/atoms/Button'; // ボタンコンポーネントをインポート
-import { fetchComplexes, deleteComplex } from '../services/api'; // 実際のAPI関数をインポート
+import { fetchComplexes, deleteComplex } from '../services/api';
 
 const AddButtonWrapper = styled.div`
   text-align: center;
@@ -67,10 +67,12 @@ const ComplexesPage: React.FC = () => {
 
   // 削除ミューテーション
   const deleteMutation = useMutation<void, Error, number>({
-    mutationFn: deleteComplexAPI,
+    mutationFn: deleteComplex,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['complexes'] }); // キャッシュを無効化して再フェッチ      
+      queryClient.invalidateQueries({ queryKey: ['complexes'] }); // キャッシュを無効化して再フェッチ
+      // eslint-disable-next-line no-undef
       alert(t('deleteConfirmation', { id: '' }).replace('{{id}} ', '')); // 実際には削除されたIDを渡す
+    },
     onError: (err) => {
       // eslint-disable-next-line no-undef
       alert(`削除に失敗しました: ${err.message}`);
@@ -85,12 +87,14 @@ const ComplexesPage: React.FC = () => {
   const handleViewGoals = (id: number) => {
     console.log(`目標を見る/設定: Complex ID ${id}`);
     // TODO: React Routerを使用して目標設定ページへ遷移
+    // eslint-disable-next-line no-undef
     alert(t('viewSetGoalsButton') + ` (ID: ${id}) 画面へ（未実装）`);
   };
 
   const handleEditComplex = (id: number) => {
     console.log(`編集: Complex ID ${id}`);
     // TODO: React Routerを使用して編集ページへ遷移
+    // eslint-disable-next-line no-undef
     alert(t('editButton') + ` (ID: ${id}) 画面へ（未実装）`);
   };
 
@@ -106,7 +110,10 @@ const ComplexesPage: React.FC = () => {
   // const [showDummyData, setShowDummyData] = useState(false);
   // useEffect(() => { ... }, [isLoading, error, complexes]);
 
-  if (isLoading && !showDummyData)
+  if (
+    isLoading
+    // && !showDummyData
+  )
     return (
       <PageWrapper>
         <MainContent>
@@ -127,7 +134,7 @@ const ComplexesPage: React.FC = () => {
     );
 
   return (
-    <PageWrapper>      
+    <PageWrapper>
       <Header onAddNewComplex={handleAddNewComplex} />
       <MainContent>
         <PageTitleWrapper>
@@ -136,9 +143,9 @@ const ComplexesPage: React.FC = () => {
         </PageTitleWrapper>
         {/* 新規登録ボタンをページコンテンツ内に追加 */}
         <AddButtonWrapper>
-           <Button variant="primary" onClick={handleAddNewComplex}>
-             + {t('addNewComplexButton')}
-           </Button>
+          <Button variant="primary" onClick={handleAddNewComplex}>
+            + {t('addNewComplexButton')}
+          </Button>
         </AddButtonWrapper>
         <ComplexList
           complexes={complexes} // TanStack Queryがデータを管理

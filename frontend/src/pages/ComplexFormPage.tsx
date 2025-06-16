@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm, type SubmitHandler } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +11,7 @@ import Input from '../components/common/atoms/Input';
 import Textarea from '../components/common/atoms/Textarea';
 import FormGroup from '../components/common/molecules/FormGroup';
 
-import type { ComplexInput } from '../types/complex';
+import type { Complex, ComplexInput } from '../types/complex';
 import { createComplex } from '../services/api';
 
 const PageWrapper = styled.div`
@@ -65,10 +65,12 @@ const ComplexFormPage: React.FC = () => {
     mutationFn: createComplex,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['complexes'] }); // コンプレックス一覧キャッシュを無効化
+      // eslint-disable-next-line no-undef
       alert(t('complexForm.successMessage')); // 成功メッセージ
       navigate('/'); // 一覧ページへ遷移
     },
     onError: (error) => {
+      // eslint-disable-next-line no-undef
       alert(`${t('complexForm.errorMessage')}: ${error.message}`); // エラーメッセージ
     },
   });
@@ -117,16 +119,16 @@ const ComplexFormPage: React.FC = () => {
             <Button
               variant="secondary"
               onClick={handleCancel}
-              disabled={createComplexMutation.isLoading}
+              disabled={createComplexMutation.isPending}
             >
               {t('complexForm.cancelButton')}
             </Button>
             <Button
               variant="primary"
               type="submit"
-              disabled={createComplexMutation.isLoading}
+              disabled={createComplexMutation.isPending}
             >
-              {createComplexMutation.isLoading
+              {createComplexMutation.isPending
                 ? t('complexForm.savingButton')
                 : t('complexForm.submitButton')}
             </Button>

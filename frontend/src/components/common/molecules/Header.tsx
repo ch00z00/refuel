@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import Button from '../atoms/Button';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 const HeaderWrapper = styled.header`
   background-color: rgba(255, 255, 255, 0.8);
@@ -41,7 +41,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onAddNewComplex }) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { t, i18n } = useTranslation();
 
   const changeLanguage = (lng: string) => {
@@ -78,11 +78,10 @@ const Header: React.FC<HeaderProps> = ({ onAddNewComplex }) => {
             </Button>
           </LanguageSwitcher>
         </div>
-        {/* 新規登録ボタンはComplexesPageでのみ表示するため、Headerからは削除 */}
-          <Button variant="primary" size="small" onClick={onAddNewComplex}>
-            + {t('addNewComplexButton')}
-          </Button>
-        </div>
+        {/* TODO: 新規登録ボタンはComplexesPageでのみ表示するため、Headerからは削除 */}
+        <Button variant="primary" size="small" onClick={onAddNewComplex}>
+          + {t('addNewComplexButton')}
+        </Button>
       </NavContainer>
     </HeaderWrapper>
   );

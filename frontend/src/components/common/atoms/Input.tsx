@@ -1,4 +1,4 @@
-import React, { InputHTMLAttributes, forwardRef } from 'react';
+import { type InputHTMLAttributes, forwardRef } from 'react';
 import styled from 'styled-components';
 
 const StyledInput = styled.input`
@@ -20,7 +20,10 @@ const StyledInput = styled.input`
 `;
 
 const Input = forwardRef<
+  // TODO: Remove eslint-disable-next-line after refactoring
+  // eslint-disable-next-line no-undef
   HTMLInputElement,
+  // eslint-disable-next-line no-undef
   InputHTMLAttributes<HTMLInputElement>
 >((props, ref) => <StyledInput {...props} ref={ref} />);
 
