@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import Header from '../components/common/molecules/Header';
+import { useNavigate } from 'react-router-dom';
+import Header from '../components/common/molecules/Header'; // Headerは残す
 // import Footer from '../components/footer/Footer';
 import ComplexList from '../components/complexes/organisms/ComplexList';
 import type { Complex } from '../types/complex';
-// import { fetchComplexes, deleteComplex } from '../services/api'; // APIサービスを想定
 
 const PageWrapper = styled.div`
   display: flex;
@@ -41,69 +41,18 @@ const PageSubtitle = styled.p`
   margin: 0 auto;
 `;
 
-// --- ダミーデータとダミーAPI関数 ---
-const dummyComplexesData: Complex[] = [
-  {
-    id: 1,
-    user_id: 'user-test-123',
-    content:
-      '人前で話すのが極度に苦手で、声が震えてしまう。特に大人数の前だと頭が真っ白になる。',
-    category: 'コミュニケーション',
-    created_at: '2023-10-27T10:00:00Z',
-    updated_at: '2023-10-26T10:00:00Z',
-  },
-  {
-    id: 2,
-    user_id: 'user-test-123',
-    content:
-      '計画を立てても三日坊主で終わってしまう。継続力がない自分に嫌気がさす。',
-    category: '自己管理',
-    created_at: '2023-10-26T14:30:00Z',
-    updated_at: '2023-10-25T14:30:00Z',
-  },
-  {
-    id: 3,
-    user_id: 'user-test-123',
-    content: '他人の評価を気にしすぎて、自分の意見をなかなか言い出せない。',
-    category: '対人関係',
-    created_at: '2023-10-25T09:15:00Z',
-    updated_at: '2023-10-24T09:15:00Z',
-  },
-];
+import Button from '../components/common/atoms/Button'; // ボタンコンポーネントをインポート
+import { fetchComplexes, deleteComplex } from '../services/api'; // 実際のAPI関数をインポート
 
-// ダミーのAPIフェッチ関数 (TanStack Query用)
-const fetchComplexes = async (): Promise<Complex[]> => {
-  console.log('Fetching complexes...');
-  // APIエンドポイント: GET /api/v1/complexes
-  // const response = await fetch('/api/v1/complexes', { headers: {'X-User-ID': 'test-user-uuid-12345'} });
-  // if (!response.ok) throw new Error('Network response was not ok');
-  // return response.json();
-  return new Promise((resolve) =>
-    // eslint-disable-next-line no-undef
-    setTimeout(() => resolve(dummyComplexesData), 1000)
-  );
-};
-
-// ダミーの削除API関数
-const deleteComplexAPI = async (id: number): Promise<void> => {
-  console.log(`Deleting complex with id: ${id}`);
-  // APIエンドポイント: DELETE /api/v1/complexes/${id}
-  // const response = await fetch(`/api/v1/complexes/${id}`, { method: 'DELETE', headers: {'X-User-ID': 'test-user-uuid-12345'} });
-  // if (!response.ok) throw new Error('Failed to delete complex');
-  return new Promise((resolve) =>
-    // eslint-disable-next-line no-undef
-    setTimeout(() => {
-      const index = dummyComplexesData.findIndex((c) => c.id === id);
-      if (index > -1) dummyComplexesData.splice(index, 1);
-      resolve();
-    }, 500)
-  );
-};
-// --- ここまでダミー ---
+const AddButtonWrapper = styled.div`
+  text-align: center;
+  margin-top: 2rem; /* 32px */
+`;
 
 const ComplexesPage: React.FC = () => {
   const queryClient = useQueryClient();
-  const { t } = useTranslation(); // t関数とi18nインスタンスを取得
+  const { t } = useTranslation();
+  const navigate = useNavigate(); // useNavigateフックを取得
 
   // TanStack Query を使用してデータをフェッチ
   const {
@@ -112,7 +61,7 @@ const ComplexesPage: React.FC = () => {
     error,
   } = useQuery<Complex[], Error>({
     queryKey: ['complexes'],
-    queryFn: fetchComplexes,
+    queryFn: fetchComplexes, // ダミー関数から実際のAPI関数へ
     // staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
@@ -120,10 +69,8 @@ const ComplexesPage: React.FC = () => {
   const deleteMutation = useMutation<void, Error, number>({
     mutationFn: deleteComplexAPI,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['complexes'] }); // キャッシュを無効化して再フェッチ
-      // eslint-disable-next-line no-undef
+      queryClient.invalidateQueries({ queryKey: ['complexes'] }); // キャッシュを無効化して再フェッチ      
       alert(t('deleteConfirmation', { id: '' }).replace('{{id}} ', '')); // 実際には削除されたIDを渡す
-    },
     onError: (err) => {
       // eslint-disable-next-line no-undef
       alert(`削除に失敗しました: ${err.message}`);
@@ -132,25 +79,22 @@ const ComplexesPage: React.FC = () => {
 
   const handleAddNewComplex = () => {
     console.log('新しいコンプレックスを登録');
-    // TODO: React Routerを使用して登録ページへ遷移
-    // eslint-disable-next-line no-undef
-    alert(t('registerComplexButton') + '画面へ（未実装）');
+    navigate('/complexes/new'); // 登録ページへ遷移
   };
 
   const handleViewGoals = (id: number) => {
     console.log(`目標を見る/設定: Complex ID ${id}`);
     // TODO: React Routerを使用して目標設定ページへ遷移
-    // eslint-disable-next-line no-undef
     alert(t('viewSetGoalsButton') + ` (ID: ${id}) 画面へ（未実装）`);
   };
 
   const handleEditComplex = (id: number) => {
     console.log(`編集: Complex ID ${id}`);
     // TODO: React Routerを使用して編集ページへ遷移
-    // eslint-disable-next-line no-undef
     alert(t('editButton') + ` (ID: ${id}) 画面へ（未実装）`);
   };
 
+  // 削除処理はComplexCardからComplexesPageに移譲
   const handleDeleteComplex = (id: number) => {
     if (window.confirm(t('deleteConfirmation', { id }))) {
       deleteMutation.mutate(id);
@@ -158,21 +102,9 @@ const ComplexesPage: React.FC = () => {
   };
 
   // ローディングとエラー表示のデモ
-  const [showDummyData, setShowDummyData] = useState(false);
-  useEffect(() => {
-    // eslint-disable-next-line no-undef
-    const timer = setTimeout(() => {
-      setShowDummyData(true);
-      // 0件表示のテストのため、初期は空配列を渡す
-      if (complexes.length === 0 && !isLoading && !error) {
-        // このデモでは、TanStack Queryがダミーデータをフェッチするので、
-        // 0件表示はComplexListコンポーネントの初期状態に依存します。
-        // 実際のAPI連携では、isLoadingとerrorの状態を見て適切に処理します。
-      }
-    }, 2000); // 2秒後にダミーデータを表示する（実際はTanStack Queryが管理）
-    // eslint-disable-next-line no-undef
-    return () => clearTimeout(timer);
-  }, [isLoading, error, complexes]);
+  // TanStack QueryがisLoadingとerrorを管理するため、デモ用のstateは不要
+  // const [showDummyData, setShowDummyData] = useState(false);
+  // useEffect(() => { ... }, [isLoading, error, complexes]);
 
   if (isLoading && !showDummyData)
     return (
@@ -195,15 +127,21 @@ const ComplexesPage: React.FC = () => {
     );
 
   return (
-    <PageWrapper>
+    <PageWrapper>      
       <Header onAddNewComplex={handleAddNewComplex} />
       <MainContent>
         <PageTitleWrapper>
           <PageTitle>{t('complexesPageTitle')}</PageTitle>
           <PageSubtitle>{t('complexesPageSubtitle')}</PageSubtitle>
         </PageTitleWrapper>
+        {/* 新規登録ボタンをページコンテンツ内に追加 */}
+        <AddButtonWrapper>
+           <Button variant="primary" onClick={handleAddNewComplex}>
+             + {t('addNewComplexButton')}
+           </Button>
+        </AddButtonWrapper>
         <ComplexList
-          complexes={showDummyData ? complexes : []} // デモ用: TanStack Queryがデータを管理
+          complexes={complexes} // TanStack Queryがデータを管理
           onViewGoals={handleViewGoals}
           onEdit={handleEditComplex}
           onDelete={handleDeleteComplex}

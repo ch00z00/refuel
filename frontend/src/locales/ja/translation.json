@@ -12,5 +12,17 @@
   "editButton": "編集",
   "deleteButton": "削除",
   "deleteConfirmation": "コンプレックスID {{id}} を本当に削除しますか？",
-  "lastUpdated": "最終更新: "
+  "lastUpdated": "最終更新: ",
+  "complexForm": {
+    "title": "新しいコンプレックスを登録",
+    "contentLabel": "コンプレックスの内容",
+    "categoryLabel": "カテゴリ",
+    "contentRequired": "コンプレックスの内容は必須です。",
+    "categoryRequired": "カテゴリは必須です。",
+    "submitButton": "登録する",
+    "savingButton": "保存中...",
+    "cancelButton": "キャンセル",
+    "successMessage": "コンプレックスを登録しました！",
+    "errorMessage": "コンプレックスの登録に失敗しました"
+  }
 }

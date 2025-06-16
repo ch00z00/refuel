@@ -12,5 +12,17 @@
   "editButton": "Edit",
   "deleteButton": "Delete",
   "deleteConfirmation": "Are you sure you want to delete Complex ID {{id}}?",
-  "lastUpdated": "Last updated: "
+  "lastUpdated": "Last updated: ",
+  "complexForm": {
+    "title": "Register New Complex",
+    "contentLabel": "Complex Content",
+    "categoryLabel": "Category",
+    "contentRequired": "Complex content is required.",
+    "categoryRequired": "Category is required.",
+    "submitButton": "Register",
+    "savingButton": "Saving...",
+    "cancelButton": "Cancel",
+    "successMessage": "Complex registered successfully!",
+    "errorMessage": "Failed to register complex"
+  }
 }

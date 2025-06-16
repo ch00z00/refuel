@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import Button from '../../common/atoms/Button';
+import { useNavigate } from 'react-router-dom';
 
 const MessageWrapper = styled.div`
   margin-top: 3rem; /* 48px */
@@ -42,6 +43,7 @@ interface NoComplexesMessageProps {
 const NoComplexesMessage: React.FC<NoComplexesMessageProps> = ({
   onAddNewComplex,
 }) => {
+  const navigate = useNavigate();
   const { t } = useTranslation();
   return (
     <MessageWrapper>
@@ -64,7 +66,7 @@ const NoComplexesMessage: React.FC<NoComplexesMessageProps> = ({
       <Title>{t('noComplexesTitle')}</Title>
       <Subtitle>{t('noComplexesSubtitle')}</Subtitle>
       <ButtonWrapper>
-        <Button variant="primary" onClick={onAddNewComplex}>
+        <Button variant="primary" onClick={() => navigate('/complexes/new')}>
           {t('registerComplexButton')}
         </Button>
       </ButtonWrapper>
