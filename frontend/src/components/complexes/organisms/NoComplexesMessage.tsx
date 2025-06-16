@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 import Button from '../../common/atoms/Button';
 
 const MessageWrapper = styled.div`
@@ -41,6 +42,7 @@ interface NoComplexesMessageProps {
 const NoComplexesMessage: React.FC<NoComplexesMessageProps> = ({
   onAddNewComplex,
 }) => {
+  const { t } = useTranslation();
   return (
     <MessageWrapper>
       <IconWrapper>
@@ -59,13 +61,11 @@ const NoComplexesMessage: React.FC<NoComplexesMessageProps> = ({
           />
         </svg>
       </IconWrapper>
-      <Title>コンプレックスがまだありません</Title>
-      <Subtitle>
-        最初のコンプレックスを登録して、自己分析を始めましょう。
-      </Subtitle>
+      <Title>{t('noComplexesTitle')}</Title>
+      <Subtitle>{t('noComplexesSubtitle')}</Subtitle>
       <ButtonWrapper>
         <Button variant="primary" onClick={onAddNewComplex}>
-          コンプレックスを登録する
+          {t('registerComplexButton')}
         </Button>
       </ButtonWrapper>
     </MessageWrapper>

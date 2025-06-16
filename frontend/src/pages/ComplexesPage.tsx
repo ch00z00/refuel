@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import Header from '../components/common/molecules/Header';
 // import Footer from '../components/footer/Footer';
 import ComplexList from '../components/complexes/organisms/ComplexList';
@@ -102,6 +103,7 @@ const deleteComplexAPI = async (id: number): Promise<void> => {
 
 const ComplexesPage: React.FC = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation(); // t関数とi18nインスタンスを取得
 
   // TanStack Query を使用してデータをフェッチ
   const {
@@ -120,7 +122,7 @@ const ComplexesPage: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['complexes'] }); // キャッシュを無効化して再フェッチ
       // eslint-disable-next-line no-undef
-      alert('コンプレックスを削除しました（ダミー）');
+      alert(t('deleteConfirmation', { id: '' }).replace('{{id}} ', '')); // 実際には削除されたIDを渡す
     },
     onError: (err) => {
       // eslint-disable-next-line no-undef
@@ -132,25 +134,25 @@ const ComplexesPage: React.FC = () => {
     console.log('新しいコンプレックスを登録');
     // TODO: React Routerを使用して登録ページへ遷移
     // eslint-disable-next-line no-undef
-    alert('コンプレックス登録画面へ（未実装）');
+    alert(t('registerComplexButton') + '画面へ（未実装）');
   };
 
   const handleViewGoals = (id: number) => {
     console.log(`目標を見る/設定: Complex ID ${id}`);
     // TODO: React Routerを使用して目標設定ページへ遷移
     // eslint-disable-next-line no-undef
-    alert(`コンプレックスID ${id} の目標設定画面へ（未実装）`);
+    alert(t('viewSetGoalsButton') + ` (ID: ${id}) 画面へ（未実装）`);
   };
 
   const handleEditComplex = (id: number) => {
     console.log(`編集: Complex ID ${id}`);
     // TODO: React Routerを使用して編集ページへ遷移
     // eslint-disable-next-line no-undef
-    alert(`コンプレックスID ${id} の編集画面へ（未実装）`);
+    alert(t('editButton') + ` (ID: ${id}) 画面へ（未実装）`);
   };
 
   const handleDeleteComplex = (id: number) => {
-    if (window.confirm(`コンプレックスID ${id} を本当に削除しますか？`)) {
+    if (window.confirm(t('deleteConfirmation', { id }))) {
       deleteMutation.mutate(id);
     }
   };
@@ -176,7 +178,7 @@ const ComplexesPage: React.FC = () => {
     return (
       <PageWrapper>
         <MainContent>
-          <PageTitle>読み込み中...</PageTitle>
+          <PageTitle>{t('loading')}</PageTitle>
         </MainContent>
       </PageWrapper>
     ); // 初期ローディング
@@ -184,7 +186,10 @@ const ComplexesPage: React.FC = () => {
     return (
       <PageWrapper>
         <MainContent>
-          <PageTitle>エラー: {error.message}</PageTitle>
+          <PageTitle>
+            {t('errorPrefix')}
+            {error.message}
+          </PageTitle>
         </MainContent>
       </PageWrapper>
     );
@@ -194,10 +199,8 @@ const ComplexesPage: React.FC = () => {
       <Header onAddNewComplex={handleAddNewComplex} />
       <MainContent>
         <PageTitleWrapper>
-          <PageTitle>あなたのコンプレックス</PageTitle>
-          <PageSubtitle>
-            ここでは、あなたが登録したコンプレックスを確認し、それらを成長の糧に変えるための第一歩を踏み出せます。
-          </PageSubtitle>
+          <PageTitle>{t('complexesPageTitle')}</PageTitle>
+          <PageSubtitle>{t('complexesPageSubtitle')}</PageSubtitle>
         </PageTitleWrapper>
         <ComplexList
           complexes={showDummyData ? complexes : []} // デモ用: TanStack Queryがデータを管理

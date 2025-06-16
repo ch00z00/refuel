@@ -1,0 +1,15 @@
+{
+  "headerTitle": "Re:Fuel",
+  "addNewComplexButton": "Register New Complex",
+  "complexesPageTitle": "Your Complexes",
+  "complexesPageSubtitle": "Here you can review your registered complexes and take the first step to turn them into fuel for growth.",
+  "loading": "Now Loading...",
+  "errorPrefix": "Error: ",
+  "noComplexesTitle": "No Complexes Yet",
+  "noComplexesSubtitle": "Register your first complex and start your self-analysis.",
+  "registerComplexButton": "Register Complex",
+  "viewSetGoalsButton": "View/Set Goals",
+  "editButton": "Edit",
+  "deleteButton": "Delete",
+  "deleteConfirmation": "Are you sure you want to delete Complex ID {{id}}?"
+}

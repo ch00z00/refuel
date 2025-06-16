@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { GlobalStyles } from './styles/GlobalStyles';
 import { ThemeProvider } from 'styled-components'; // 必要であれば
+import './i18n'; // i18nextの初期化
 
 // React Query Client
 const queryClient = new QueryClient();

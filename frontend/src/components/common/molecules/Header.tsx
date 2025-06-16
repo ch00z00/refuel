@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 import Button from '../atoms/Button';
 
 const HeaderWrapper = styled.header`
@@ -28,18 +29,50 @@ const Logo = styled.h1`
   color: #1d1d1f;
 `;
 
+const LanguageSwitcher = styled.div`
+  margin-left: 1rem;
+  display: flex;
+  gap: 0.5rem;
+`;
+
 interface HeaderProps {
   onAddNewComplex: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ onAddNewComplex }) => {
+  const { t, i18n } = useTranslation();
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
+
   return (
     <HeaderWrapper>
       <NavContainer>
-        <Logo>Re:Fuel</Logo>
-        <Button variant="primary" size="small" onClick={onAddNewComplex}>
-          新しいコンプレックスを登録
-        </Button>
+        <Logo>{t('headerTitle')}</Logo>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Button variant="primary" size="small" onClick={onAddNewComplex}>
+            {t('addNewComplexButton')}
+          </Button>
+          <LanguageSwitcher>
+            <Button
+              size="small"
+              variant="secondary"
+              onClick={() => changeLanguage('ja')}
+              disabled={i18n.resolvedLanguage === 'ja'}
+            >
+              JA
+            </Button>
+            <Button
+              size="small"
+              variant="secondary"
+              onClick={() => changeLanguage('en')}
+              disabled={i18n.resolvedLanguage === 'en'}
+            >
+              EN
+            </Button>
+          </LanguageSwitcher>
+        </div>
       </NavContainer>
     </HeaderWrapper>
   );
