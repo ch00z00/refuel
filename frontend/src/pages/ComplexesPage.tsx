@@ -70,11 +70,9 @@ const ComplexesPage: React.FC = () => {
     mutationFn: deleteComplex,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['complexes'] }); // キャッシュを無効化して再フェッチ
-      // eslint-disable-next-line no-undef
       alert(t('deleteConfirmation', { id: '' }).replace('{{id}} ', '')); // 実際には削除されたIDを渡す
     },
     onError: (err) => {
-      // eslint-disable-next-line no-undef
       alert(`削除に失敗しました: ${err.message}`);
     },
   });
@@ -87,14 +85,12 @@ const ComplexesPage: React.FC = () => {
   const handleViewGoals = (id: number) => {
     console.log(`目標を見る/設定: Complex ID ${id}`);
     // TODO: React Routerを使用して目標設定ページへ遷移
-    // eslint-disable-next-line no-undef
     alert(t('viewSetGoalsButton') + ` (ID: ${id}) 画面へ（未実装）`);
   };
 
   const handleEditComplex = (id: number) => {
     console.log(`編集: Complex ID ${id}`);
     // TODO: React Routerを使用して編集ページへ遷移
-    // eslint-disable-next-line no-undef
     alert(t('editButton') + ` (ID: ${id}) 画面へ（未実装）`);
   };
 

@@ -1,7 +1,7 @@
 import type { Complex, ComplexInput } from '../types/complex';
 
 // 仮のユーザーID (認証基盤実装時に置き換える)
-const DUMMY_USER_ID = 'test-user-uuid-12345';
+const DUMMY_USER_ID = 'user-test-123';
 
 const API_BASE_URL = '/api/v1';
 
@@ -12,7 +12,6 @@ const getAuthHeaders = () => ({
 
 /* コンプレックス一覧取得 */
 export const fetchComplexes = async (): Promise<Complex[]> => {
-  // eslint-disable-next-line no-undef
   const response = await fetch(`${API_BASE_URL}/complexes`, {
     headers: getAuthHeaders(),
   });
@@ -22,7 +21,6 @@ export const fetchComplexes = async (): Promise<Complex[]> => {
 
 /* 新しいコンプレックスを登録 */
 export const createComplex = async (data: ComplexInput): Promise<Complex> => {
-  // eslint-disable-next-line no-undef
   const response = await fetch(`${API_BASE_URL}/complexes`, {
     method: 'POST',
     headers: getAuthHeaders(),
@@ -34,7 +32,6 @@ export const createComplex = async (data: ComplexInput): Promise<Complex> => {
 
 // コンプレックス削除 (ComplexesPage.tsxで使用していたダミー関数を置き換え)
 export const deleteComplex = async (id: number): Promise<void> => {
-  // eslint-disable-next-line no-undef
   const response = await fetch(`${API_BASE_URL}/complexes/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),

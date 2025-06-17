@@ -104,7 +104,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		userID := c.GetHeader("X-User-ID")
 		if userID == "" {
 			// テスト用のダミーユーザーID (実際の認証基盤実装時に置き換える)
-			userID = "test-user-uuid-12345"
+			userID = "user-test-123"
 			log.Printf("Warning: X-User-ID header not found, using default test user ID: %s", userID)
 		}
 		c.Set("userID", userID)

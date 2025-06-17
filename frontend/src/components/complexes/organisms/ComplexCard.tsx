@@ -70,14 +70,10 @@ const ActionsWrapper = styled.div`
   margin-top: auto; /* Pushes actions to the bottom */
 `;
 
-// TODO: Remove eslint-disable-next-line after refactoring
 interface ComplexCardProps {
   complex: Complex;
-  // eslint-disable-next-line no-unused-vars
   onViewGoals: (id: number) => void;
-  // eslint-disable-next-line no-unused-vars
   onEdit: (id: number) => void;
-  // eslint-disable-next-line no-unused-vars
   onDelete: (id: number) => void;
   animationDelay: number;
 }

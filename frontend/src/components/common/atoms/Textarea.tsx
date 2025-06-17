@@ -21,10 +21,7 @@ const StyledTextarea = styled.textarea`
 `;
 
 const Textarea = forwardRef<
-  // TODO: Remove eslint-disable-next-line after refactoring
-  // eslint-disable-next-line no-undef
   HTMLTextAreaElement,
-  // eslint-disable-next-line no-undef
   TextareaHTMLAttributes<HTMLTextAreaElement>
 >((props, ref) => <StyledTextarea {...props} ref={ref} />);
 

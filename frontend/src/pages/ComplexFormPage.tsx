@@ -65,12 +65,10 @@ const ComplexFormPage: React.FC = () => {
     mutationFn: createComplex,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['complexes'] }); // コンプレックス一覧キャッシュを無効化
-      // eslint-disable-next-line no-undef
       alert(t('complexForm.successMessage')); // 成功メッセージ
       navigate('/'); // 一覧ページへ遷移
     },
     onError: (error) => {
-      // eslint-disable-next-line no-undef
       alert(`${t('complexForm.errorMessage')}: ${error.message}`); // エラーメッセージ
     },
   });

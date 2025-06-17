@@ -40,5 +40,6 @@ export default [
       'prettier/prettier': 'error',
       '@typescript-eslint/no-unused-vars': 'warn',
     },
+    env: { browser: true, es2020: true },
   },
 ];

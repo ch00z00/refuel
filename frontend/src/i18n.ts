@@ -21,7 +21,6 @@ i18n
   .init({
     resources,
     fallbackLng: 'ja', // デフォルトの言語
-    // eslint-disable-next-line no-undef
     debug: process.env.NODE_ENV === 'development', // 開発モード時のみデバッグ情報を出力
 
     interpolation: {
