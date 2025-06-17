@@ -9,7 +9,7 @@ services:
    - "3000:3000" # Viteのデフォルトポート
   volumes:
    - ./frontend:/app # ソースコードの同期
-   - /app/node_modules # node_modulesが上書きされないように
+   - /app/node_modules # ホストからnode_modulesが上書きされないように
   environment:
    - CHOKIDAR_USEPOLLING=true # ホットリロードのため
   depends_on:

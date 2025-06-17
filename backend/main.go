@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-migrate/migrate/v4"
@@ -570,8 +571,15 @@ func main() {
 	r.Use(gin.Logger())   // 標準のロガー
 	r.Use(gin.Recovery()) // パニックリカバリ
 	// CORS設定 (必要に応じてカスタマイズ)
-	// r.Use(cors.Default())
-	r.Use(AuthMiddleware()) // 認証ミドルウェア
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"}, // フロントエンドのオリジン (Viteのデフォルトポート)
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-User-ID"}, // X-User-ID を追加
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+}))
+	r.Use(AuthMiddleware())
 
 	// --- ルーティング ---
 	// APIのベースパスを `/api/v1` とします (openapi.yamlのservers.urlに合わせる)

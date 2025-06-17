@@ -3,7 +3,7 @@ import type { Complex, ComplexInput } from '../types/complex';
 // 仮のユーザーID (認証基盤実装時に置き換える)
 const DUMMY_USER_ID = 'test-user-uuid-12345';
 
-const API_BASE_URL = '/api/v1'; // バックエンドのベースURL
+const API_BASE_URL = '/api/v1';
 
 const getAuthHeaders = () => ({
   'Content-Type': 'application/json',
