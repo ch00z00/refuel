@@ -572,9 +572,9 @@ func main() {
 	r.Use(gin.Recovery()) // パニックリカバリ
 	// CORS設定 (必要に応じてカスタマイズ)
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"}, // フロントエンドのオリジン (Viteのデフォルトポート)
+		AllowOrigins:     []string{"http://localhost:5173", "http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-User-ID"}, // X-User-ID を追加
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-User-ID"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,

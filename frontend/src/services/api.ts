@@ -1,8 +1,6 @@
 import type { Complex, ComplexInput } from '../types/complex';
 
-// 仮のユーザーID (認証基盤実装時に置き換える)
 const DUMMY_USER_ID = 'user-test-123';
-
 const API_BASE_URL = '/api/v1';
 
 const getAuthHeaders = () => ({
@@ -10,7 +8,7 @@ const getAuthHeaders = () => ({
   'X-User-ID': DUMMY_USER_ID,
 });
 
-/* コンプレックス一覧取得 */
+/* Get all complexes */
 export const fetchComplexes = async (): Promise<Complex[]> => {
   const response = await fetch(`${API_BASE_URL}/complexes`, {
     headers: getAuthHeaders(),
@@ -19,18 +17,36 @@ export const fetchComplexes = async (): Promise<Complex[]> => {
   return response.json();
 };
 
-/* 新しいコンプレックスを登録 */
+/* Create new complex */
 export const createComplex = async (data: ComplexInput): Promise<Complex> => {
   const response = await fetch(`${API_BASE_URL}/complexes`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
   });
-  if (!response.ok) throw new Error('Failed to create complex');
+  if (!response.ok) {
+    let errorDetails = '';
+    try {
+      const responseText = await response.text();
+      if (responseText) {
+        try {
+          const jsonData = JSON.parse(responseText);
+          errorDetails = `: ${JSON.stringify(jsonData)}`;
+        } catch (jsonError) {
+          errorDetails = `: ${responseText}`;
+        }
+      }
+    } catch (readError) {
+      errorDetails = ': Failed to read error response body';
+    }
+    throw new Error(
+      `Failed to create complex (status: ${response.status})${errorDetails}`
+    );
+  }
   return response.json();
 };
 
-// コンプレックス削除 (ComplexesPage.tsxで使用していたダミー関数を置き換え)
+/* Delete complex */
 export const deleteComplex = async (id: number): Promise<void> => {
   const response = await fetch(`${API_BASE_URL}/complexes/${id}`, {
     method: 'DELETE',
@@ -39,4 +55,10 @@ export const deleteComplex = async (id: number): Promise<void> => {
   if (!response.ok) throw new Error('Failed to delete complex');
 };
 
-// TODO: 他のAPI関数 (fetchComplex, updateComplex, fetchGoals, createGoalなど) もここに追加
+/*
+ * TODO: 他のAPI関数もここに追加
+ * - fetchComplex
+ * - updateComplex
+ * - fetchGoals
+ * - createGoal
+ */
