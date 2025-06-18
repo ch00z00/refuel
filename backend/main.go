@@ -34,12 +34,16 @@ type Complex struct {
 	Category  string    `json:"category" gorm:"not null" validate:"required"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+	Goals     []Goal    `json:"goals,omitempty"`
 }
 
 // ComplexInput defines the expected input for creating a new complex.
 type ComplexInput struct {
-	Content  string `json:"content" validate:"required,min=1,max=255"`
-	Category string `json:"category" validate:"required,min=1,max=100"`
+	Content        string `json:"content" validate:"required,min=1,max=255"`
+	Category       string `json:"category" validate:"required,min=1,max=100"`
+	SurfaceGoal    string `json:"surface_goal,omitempty" validate:"omitempty,min=1,max=255"`    // Optional: Goal to be created with complex
+	UnderlyingGoal string `json:"underlying_goal,omitempty" validate:"omitempty,min=1,max=255"` // Optional: Goal to be created with complex
+	InitialActions []ActionInput `json:"initial_actions,omitempty" validate:"omitempty,dive"` // Optional: Actions for the new goal
 }
 
 // Goal represents the goal entity.
@@ -136,18 +140,57 @@ func CreateComplexHandler(c *gin.Context) {
 		return
 	}
 
+	// Start a database transaction
+	tx := db.Begin()
+	if tx.Error != nil {
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to start transaction: "+tx.Error.Error()))
+		return
+	}
+
+	// Create Complex
 	complex := Complex{
 		UserID:   userID.(string),
 		Content:  input.Content,
 		Category: input.Category,
 	}
 
-	if result := db.Create(&complex); result.Error != nil {
+	if result := tx.Create(&complex); result.Error != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to create complex: "+result.Error.Error()))
 		return
 	}
 
-	c.JSON(http.StatusCreated, complex)
+	// If goal fields are provided, create a goal associated with this complex
+	if input.SurfaceGoal != "" && input.UnderlyingGoal != "" {
+		goal := Goal{
+			UserID:         userID.(string),
+			ComplexID:      complex.ID, // Link to the newly created complex
+			SurfaceGoal:    input.SurfaceGoal,
+			UnderlyingGoal: input.UnderlyingGoal,
+		}
+		if result := tx.Create(&goal); result.Error != nil {
+			tx.Rollback()
+			c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to create associated goal: "+result.Error.Error()))
+			return
+		}
+	} else if input.SurfaceGoal != "" || input.UnderlyingGoal != "" {
+		// If only one of the goal fields is provided, it's an invalid request for creating a goal
+		tx.Rollback()
+		c.JSON(http.StatusBadRequest, NewErrorResponse(http.StatusBadRequest, "Both surface_goal and underlying_goal are required to create a goal"))
+		return
+	}
+
+	// Commit the transaction
+	if err := tx.Commit().Error; err != nil {
+		// Rollback is implicitly handled by GORM if Commit fails after successful operations within the transaction
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to commit transaction: "+err.Error()))
+		return
+	}
+
+	// Reload the complex with its goals to return the complete entity
+	db.Preload("Goals").First(&complex, complex.ID) // GORM will load associated goals
+
+	c.JSON(http.StatusCreated, complex) // Return the complex, potentially with its newly created goal(s)
 }
 
 // GetComplexesHandler handles fetching all complexes for the authenticated user.
