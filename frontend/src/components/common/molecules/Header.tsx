@@ -64,7 +64,7 @@ const Header: React.FC<HeaderProps> = ({ onAddNewComplex }) => {
           <LanguageSwitcher>
             <Button
               size="small"
-              variant="secondary"
+              variant={i18n.resolvedLanguage === 'ja' ? 'primary' : 'ghost'}
               onClick={() => changeLanguage('ja')}
               disabled={i18n.resolvedLanguage === 'ja'}
             >
@@ -72,7 +72,7 @@ const Header: React.FC<HeaderProps> = ({ onAddNewComplex }) => {
             </Button>
             <Button
               size="small"
-              variant="secondary"
+              variant={i18n.resolvedLanguage === 'en' ? 'primary' : 'ghost'}
               onClick={() => changeLanguage('en')}
               disabled={i18n.resolvedLanguage === 'en'}
             >

@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 
 interface ButtonProps {
-  variant?: 'primary' | 'secondary' | 'danger';
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
   size?: 'small' | 'medium' | 'large';
 }
 
@@ -52,6 +52,14 @@ const dangerStyles = css`
   }
 `;
 
+const ghostStyles = css`
+  background-color: transparent;
+  color: #1d1d1f; /* Dark text color, similar to Logo */
+  &:hover:not(:disabled) {
+    background-color: rgba(29, 29, 31, 0.08); /* Subtle hover effect */
+  }
+`;
+
 const sizeStyles = {
   small: css`
     padding: 0.375rem 0.75rem; /* 6px 12px */
@@ -77,6 +85,8 @@ export const Button = styled.button<ButtonProps>`
         return secondaryStyles;
       case 'danger':
         return dangerStyles;
+      case 'ghost':
+        return ghostStyles;
       default:
         return primaryStyles; // Default to primary
     }
