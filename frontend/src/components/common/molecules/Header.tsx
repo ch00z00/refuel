@@ -5,21 +5,19 @@ import Button from '../atoms/Button';
 // import { useNavigate } from 'react-router-dom';
 
 const HeaderWrapper = styled.header`
-  background-color: rgba(210, 213, 204, 0.6);
-  backdrop-filter: blur(10px);
+  background-color: transparent;
   position: fixed;
   top: 1rem;
   left: 1rem;
   border-radius: 2rem;
   z-index: 1000;
   width: calc(100% - 2rem);
-  box-shadow: 0 0 16px rgba(0, 0, 0, 0.1);
 `;
 
 const NavContainer = styled.div`
   max-width: 100%;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 2vw;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -80,7 +78,7 @@ const Header: React.FC<HeaderProps> = ({ onAddNewComplex }) => {
             </Button>
           </LanguageSwitcher>
         </div>
-        <Button variant="primary" size="small" onClick={onAddNewComplex}>
+        <Button variant="primary" size="medium" onClick={onAddNewComplex}>
           + {t('addNewComplexButton')}
         </Button>
       </NavContainer>
