@@ -43,7 +43,7 @@ type ComplexInput struct {
 	Category       string `json:"category" validate:"required,min=1,max=100"`
 	SurfaceGoal    string `json:"surface_goal,omitempty" validate:"omitempty,min=1,max=255"`    // Optional: Goal to be created with complex
 	UnderlyingGoal string `json:"underlying_goal,omitempty" validate:"omitempty,min=1,max=255"` // Optional: Goal to be created with complex
-	InitialActions []ActionInput `json:"initial_actions,omitempty" validate:"omitempty,dive"` // Optional: Actions for the new goal
+	Actions []ActionInput `json:"actions,omitempty" validate:"omitempty,dive"` // Optional: Actions for the new goal
 }
 
 // Goal represents the goal entity.
@@ -169,6 +169,7 @@ func CreateComplexHandler(c *gin.Context) {
 			UnderlyingGoal: input.UnderlyingGoal,
 		}
 		if result := tx.Create(&goal); result.Error != nil {
+			//lint:ignore ST1005 Error message is clear
 			tx.Rollback()
 			c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to create associated goal: "+result.Error.Error()))
 			return
@@ -258,25 +259,106 @@ func UpdateComplexHandler(c *gin.Context) {
 		return
 	}
 
-	var complex Complex
-	if result := db.Where("id = ? AND user_id = ?", complexID, userID.(string)).First(&complex); result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
+	// Start a database transaction
+	tx := db.Begin()
+	if tx.Error != nil {
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to start transaction: "+tx.Error.Error()))
+		return
+	}
+
+	var existingComplex Complex
+	if err := tx.Where("id = ? AND user_id = ?", complexID, userID.(string)).First(&existingComplex).Error; err != nil {
+		tx.Rollback()
+		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, NewErrorResponse(http.StatusNotFound, "Complex not found to update"))
 			return
 		}
-		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to find complex to update: "+result.Error.Error()))
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to find complex to update: "+err.Error()))
 		return
 	}
 
-	complex.Content = input.Content
-	complex.Category = input.Category
+	// Update Complex fields
+	existingComplex.Content = input.Content
+	existingComplex.Category = input.Category
 
-	if result := db.Save(&complex); result.Error != nil {
-		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to update complex: "+result.Error.Error()))
+	if err := tx.Save(&existingComplex).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to update complex: "+err.Error()))
 		return
 	}
 
-	c.JSON(http.StatusOK, complex)
+	// Handle associated Goal (create or update)
+	if input.SurfaceGoal != "" && input.UnderlyingGoal != "" {
+		var goal Goal
+		err := tx.Where("complex_id = ? AND user_id = ?", existingComplex.ID, userID.(string)).First(&goal).Error
+
+		if err != nil && err != gorm.ErrRecordNotFound {
+			tx.Rollback()
+			c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Error finding associated goal: "+err.Error()))
+			return
+		}
+
+		if err == gorm.ErrRecordNotFound { // Goal does not exist, create it
+			goal = Goal{
+				UserID:         userID.(string),
+				ComplexID:      existingComplex.ID,
+				SurfaceGoal:    input.SurfaceGoal,
+				UnderlyingGoal: input.UnderlyingGoal,
+			}
+			if err := tx.Create(&goal).Error; err != nil {
+				tx.Rollback()
+				c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to create associated goal: "+err.Error()))
+				return
+			}
+			// If new goal created, and initial actions are provided, create them
+			if len(input.Actions) > 0 {
+				for _, actionInput := range input.Actions {
+					var completedAtParsed *time.Time
+					if actionInput.CompletedAt != "" {
+						t, err := time.Parse(time.RFC3339, actionInput.CompletedAt)
+						if err != nil {
+							tx.Rollback()
+							c.JSON(http.StatusBadRequest, NewErrorResponse(http.StatusBadRequest, "Invalid completed_at format for action: "+err.Error()))
+							return
+						}
+						completedAtParsed = &t
+					}
+
+					action := Action{
+						UserID:      userID.(string),
+						GoalID:      goal.ID, // Link to the newly created goal
+						Content:     actionInput.Content,
+						CompletedAt: completedAtParsed,
+					}
+					if err := tx.Create(&action).Error; err != nil {
+						tx.Rollback()
+						c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to create action: "+err.Error()))
+						return
+					}
+				}
+			}
+		} else { // Goal exists, update it
+			goal.SurfaceGoal = input.SurfaceGoal
+			goal.UnderlyingGoal = input.UnderlyingGoal
+			if err := tx.Save(&goal).Error; err != nil {
+				tx.Rollback()
+				c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to update associated goal: "+err.Error()))
+				return
+			}
+		}
+	} else if input.SurfaceGoal != "" || input.UnderlyingGoal != "" {
+		tx.Rollback()
+		c.JSON(http.StatusBadRequest, NewErrorResponse(http.StatusBadRequest, "Both surface_goal and underlying_goal are required to create or update a goal via complex endpoint"))
+		return
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.JSON(http.StatusInternalServerError, NewErrorResponse(http.StatusInternalServerError, "Failed to commit transaction: "+err.Error()))
+		return
+	}
+
+	db.Preload("Goals").First(&existingComplex, existingComplex.ID)
+	c.JSON(http.StatusOK, existingComplex)
 }
 
 // DeleteComplexHandler handles deleting a complex by its ID.
