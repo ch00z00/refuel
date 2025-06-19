@@ -19,13 +19,14 @@ const FooterContentContainer = styled.div`
   height: 3rem;
 `;
 
-const AuthorName = styled.p`
-  font-size: 0.875rem; /* 14px */
+const CopyrightNotice = styled.div`
+  font-size: 0.875rem;
   font-weight: 500;
+  line-height: 1.4;
 `;
 
 const ComplexCount = styled.p`
-  font-size: 0.875rem; /* 14px */
+  font-size: 0.875rem;
   font-weight: 500;
 `;
 
@@ -37,8 +38,12 @@ const Footer: React.FC<FooterProps> = ({ totalComplexes }) => {
   return (
     <FooterWrapper>
       <FooterContentContainer>
-        <AuthorName>Yusuke Seki</AuthorName>
-        {totalComplexes > 0 && <ComplexCount>{totalComplexes}</ComplexCount>}
+        <CopyrightNotice>
+          © 2025 Yusuke Seki
+          <br />
+          All Rights Reserved
+        </CopyrightNotice>
+        <ComplexCount>{totalComplexes}</ComplexCount>
       </FooterContentContainer>
     </FooterWrapper>
   );
