@@ -5,17 +5,19 @@ import Button from '../atoms/Button';
 // import { useNavigate } from 'react-router-dom';
 
 const HeaderWrapper = styled.header`
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(210, 213, 204, 0.6);
   backdrop-filter: blur(10px);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  border-radius: 2rem;
   z-index: 1000;
-  width: 100%;
+  width: calc(100% - 2rem);
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.1);
 `;
 
 const NavContainer = styled.div`
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0 2rem;
   display: flex;
@@ -25,7 +27,7 @@ const NavContainer = styled.div`
 `;
 
 const Logo = styled.h1`
-  font-size: 1.75rem; /* 28px */
+  font-size: 1.25rem;
   font-weight: 600;
   color: #1d1d1f;
 `;
@@ -78,7 +80,6 @@ const Header: React.FC<HeaderProps> = ({ onAddNewComplex }) => {
             </Button>
           </LanguageSwitcher>
         </div>
-        {/* TODO: 新規登録ボタンはComplexesPageでのみ表示するため、Headerからは削除 */}
         <Button variant="primary" size="small" onClick={onAddNewComplex}>
           + {t('addNewComplexButton')}
         </Button>

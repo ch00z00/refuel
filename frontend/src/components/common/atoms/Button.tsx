@@ -30,12 +30,8 @@ const baseButtonStyles = css`
 `;
 
 const primaryStyles = css`
-  background-color: #007aff;
+  background-color: #242322;
   color: white;
-  box-shadow: 0 2px 4px rgba(0, 122, 255, 0.2);
-  &:hover {
-    background-color: #005ecb;
-  }
 `;
 
 const secondaryStyles = css`

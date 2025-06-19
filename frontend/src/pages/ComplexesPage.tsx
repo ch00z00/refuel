@@ -10,6 +10,7 @@ import type { Complex } from '../types/complex';
 
 const PageWrapper = styled.div`
   display: flex;
+  padding-top: 8rem;
   flex-direction: column;
   min-height: 100vh;
 `;
