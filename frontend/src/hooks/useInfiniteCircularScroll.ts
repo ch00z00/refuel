@@ -136,6 +136,11 @@ const useInfiniteCircularScroll = ({
 
       let nextDisplayIndex = currentDisplayIndex + (deltaY > 0 ? 1 : -1);
 
+      // TODO: MacBookのトラックパッドなどで勢いよくスクロールした際に複数アイテム進んでしまう問題。
+      //       慣性スクロールのdeltaYの値を考慮するか、短時間の連続イベントをより高度にフィルタリングする必要がある。
+      //       現状はisAnimatingRefでアニメーション中の多重呼び出しを防ぐのみ。
+      //       デバウンスやスロットルを再度検討する際は、UXとのバランス（遅延の許容度）が重要。
+
       if (!loopAround) {
         // ループしない場合の処理 (変更なし)
         nextDisplayIndex = Math.max(
