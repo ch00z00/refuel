@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/common/molecules/Header';
 import Footer from '../components/common/molecules/Footer';
-// import useInfiniteCircularScroll from '../hooks/useInfiniteCircularScroll'; // 今回は直接実装
+import useInfiniteCircularScroll from '../hooks/useInfiniteCircularScroll'; // 作成したフックをインポート
 import type { Complex } from '../types/complex';
 
 const PageWrapper = styled.div`
@@ -90,7 +90,7 @@ const ComplexesPage: React.FC = () => {
     // staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  /* const scrollContainerRef = useRef<HTMLDivElement>(null);
   // displayItemsは循環スクロールのために元のcomplexesを加工したもの
   const [displayItems, setDisplayItems] = useState<Complex[]>([]);
   // 実際に表示されているcomplexesの元配列における0-indexedのインデックス
@@ -132,44 +132,10 @@ const ComplexesPage: React.FC = () => {
       setDisplayItems([]);
       setActualCurrentIndex(0);
     }
-  }, [complexes]);
+  }, [complexes]); */
 
-  const handleScroll = useCallback(() => {
-    if (
-      !scrollContainerRef.current ||
-      displayItems.length <= 1 ||
-      complexes.length === 0
-    )
-      return;
-
-    const container = scrollContainerRef.current;
-    const itemHeight = container.clientHeight; // 各アイテムはコンテナと同じ高さ
-    const currentScrollTop = container.scrollTop;
-
-    // スナップされた現在の表示アイテムのインデックス (displayItemsに対するもの)
-    const snappedDisplayIndex = Math.round(currentScrollTop / itemHeight);
-
-    if (complexes.length === 1) {
-      setActualCurrentIndex(0); // 常に最初のアイテム
-      return;
-    }
-
-    // 循環ロジック: 端に達したら反対側の対応する位置にジャンプ
-    if (snappedDisplayIndex === 0) {
-      // 上端のダミー(N)に来た
-      // 実際の最後のアイテム (N) にジャンプ (displayItemsのインデックスは complexes.length)
-      container.scrollTop = itemHeight * complexes.length;
-      setActualCurrentIndex(complexes.length - 1);
-    } else if (snappedDisplayIndex === displayItems.length - 1) {
-      // 下端のダミー(1)に来た
-      // 実際の最初のアイテム (1) にジャンプ (displayItemsのインデックスは 1)
-      container.scrollTop = itemHeight * 1;
-      setActualCurrentIndex(0);
-    } else {
-      // 通常のスクロール: displayItemsのインデックスからcomplexesのインデックスを計算
-      setActualCurrentIndex(snappedDisplayIndex - 1);
-    }
-  }, [displayItems, complexes.length]);
+  const { scrollContainerRef, displayItems, actualCurrentIndex } =
+    useInfiniteCircularScroll({ items: complexes });
 
   // TODO: Complex編集画面に実装する
   // 削除ミューテーション
@@ -232,8 +198,10 @@ const ComplexesPage: React.FC = () => {
       <MainContent>
         {/* PageTitleWrapper はスクロールの外に配置するか、各アイテム内に含めるか検討 */}
         {/* <PageTitleWrapper> ... </PageTitleWrapper> */}
-        {!isLoading && !error && displayItems.length > 0 && (
-          <ScrollSnapContainer ref={scrollContainerRef} onScroll={handleScroll}>
+        {!isLoading && !error && displayItems.length > 0 ? (
+          <ScrollSnapContainer
+            ref={scrollContainerRef} /* onScrollはフック内で処理 */
+          >
             {displayItems.map((complex, index) => (
               <ComplexScrollItem key={`${complex.id}-display-${index}`}>
                 {/*
@@ -249,7 +217,7 @@ const ComplexesPage: React.FC = () => {
               </ComplexScrollItem>
             ))}
           </ScrollSnapContainer>
-        )}
+        ) : null}
         {!isLoading && !error && complexes.length === 0 && (
           <PageTitle>{t('noComplexesFound')}</PageTitle>
         )}
