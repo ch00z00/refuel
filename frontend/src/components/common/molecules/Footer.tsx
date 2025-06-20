@@ -31,10 +31,14 @@ const ComplexCount = styled.p`
 `;
 
 interface FooterProps {
+  currentComplexNumber?: number;
   totalComplexes: number;
 }
 
-const Footer: React.FC<FooterProps> = ({ totalComplexes }) => {
+const Footer: React.FC<FooterProps> = ({
+  currentComplexNumber,
+  totalComplexes,
+}) => {
   return (
     <FooterWrapper>
       <FooterContentContainer>
@@ -43,7 +47,13 @@ const Footer: React.FC<FooterProps> = ({ totalComplexes }) => {
           <br />
           All Rights Reserved
         </CopyrightNotice>
-        <ComplexCount>{totalComplexes}</ComplexCount>
+        {totalComplexes > 0 &&
+          currentComplexNumber &&
+          currentComplexNumber > 0 && (
+            <ComplexCount>
+              {currentComplexNumber} / {totalComplexes}
+            </ComplexCount>
+          )}
       </FooterContentContainer>
     </FooterWrapper>
   );
