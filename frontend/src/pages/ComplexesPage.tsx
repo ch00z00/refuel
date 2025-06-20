@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/common/molecules/Header';
 import Footer from '../components/common/molecules/Footer';
 import useInfiniteCircularScroll from '../hooks/useInfiniteCircularScroll'; // 作成したフックをインポート
+import ComplexDisplayCard from '../components/complexes/molecules/ComplexDisplayCard'; // 新しいカードコンポーネントをインポート
 import type { Complex } from '../types/complex';
 
 const PageWrapper = styled.div`
@@ -18,14 +19,11 @@ const PageWrapper = styled.div`
 
 const MainContent = styled.main`
   flex-grow: 1;
-  /* max-width: 1200px; */ /* ScrollSnapWrapperが幅を管理 */
   width: 100%;
   display: flex;
   justify-content: center;
   margin: 0 auto;
   padding: 2rem 1rem;
-  width: 100%;
-  padding: 0 1rem; /* 上下のpaddingはScrollSnapWrapperで調整 */
 `;
 
 const PageTitle = styled.h2`
@@ -59,20 +57,6 @@ const ComplexScrollItem = styled.div`
   /* border-top: 1px solid #111; */
 `;
 
-// 個々のコンプレックスを表示するカードコンポーネント（仮）
-const ComplexDisplayCard = styled.div`
-  background-color: #fff;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  width: 100%;
-  max-width: 400px; /* カードの最大幅 */
-  h2 {
-    /* ComplexScrollItem内のh2にスタイルを適用 */
-    margin-bottom: 0.5rem;
-  }
-`;
 import { fetchComplexes } from '../services/api';
 
 const ComplexesPage: React.FC = () => {
@@ -134,8 +118,12 @@ const ComplexesPage: React.FC = () => {
     }
   }, [complexes]); */
 
-  const { scrollContainerRef, displayItems, actualCurrentIndex } =
-    useInfiniteCircularScroll({ items: complexes });
+  const {
+    scrollContainerRef,
+    displayItems,
+    actualCurrentIndex,
+    scrollProgress,
+  } = useInfiniteCircularScroll({ items: complexes, loopAround: true });
 
   // TODO: Complex編集画面に実装する
   // 削除ミューテーション
@@ -196,24 +184,16 @@ const ComplexesPage: React.FC = () => {
     <PageWrapper>
       <Header onAddNewComplex={handleAddNewComplex} />
       <MainContent>
-        {/* PageTitleWrapper はスクロールの外に配置するか、各アイテム内に含めるか検討 */}
-        {/* <PageTitleWrapper> ... </PageTitleWrapper> */}
         {!isLoading && !error && displayItems.length > 0 ? (
           <ScrollSnapContainer
             ref={scrollContainerRef} /* onScrollはフック内で処理 */
           >
             {displayItems.map((complex, index) => (
               <ComplexScrollItem key={`${complex.id}-display-${index}`}>
-                {/*
-                  ComplexDisplayCardに渡すcomplexはdisplayItemsのもので良い。
-                  isFocusedなどの状態管理はactualCurrentIndexとcomplexesのIDを比較するなどして行う。
-                */}
-                <ComplexDisplayCard>
-                  <div>
-                    <h2>{complex.content}</h2>
-                    <p>Category: {complex.category}</p>
-                  </div>
-                </ComplexDisplayCard>
+                <ComplexDisplayCard
+                  complex={complex}
+                  scrollProgress={scrollProgress}
+                />
               </ComplexScrollItem>
             ))}
           </ScrollSnapContainer>

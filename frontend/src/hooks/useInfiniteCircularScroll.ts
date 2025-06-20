@@ -14,6 +14,7 @@ interface UseInfiniteCircularScrollReturn {
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   displayItems: Complex[];
   actualCurrentIndex: number; // 元のitems配列における現在のインデックス
+  scrollProgress: number; // スクロール進捗 (0-1)
   // scrollToItem: (index: number, animate?: boolean) => void; // 特定のアイテムへスクロール
 }
 
@@ -28,6 +29,7 @@ const useInfiniteCircularScroll = ({
   const [actualCurrentIndex, setActualCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false); // GSAPアニメーション中フラグ
   const currentScrollTween = useRef<gsap.core.Tween | null>(null); // GSAPトゥイーンインスタンス
+  const [scrollProgress, setScrollProgress] = useState(0); // スクロール進捗を管理
 
   // 1. displayItemsの準備 (前後にダミー要素を追加)
   useEffect(() => {
@@ -136,11 +138,6 @@ const useInfiniteCircularScroll = ({
 
       let nextDisplayIndex = currentDisplayIndex + (deltaY > 0 ? 1 : -1);
 
-      // TODO: MacBookのトラックパッドなどで勢いよくスクロールした際に複数アイテム進んでしまう問題。
-      //       慣性スクロールのdeltaYの値を考慮するか、短時間の連続イベントをより高度にフィルタリングする必要がある。
-      //       現状はisAnimatingRefでアニメーション中の多重呼び出しを防ぐのみ。
-      //       デバウンスやスロットルを再度検討する際は、UXとのバランス（遅延の許容度）が重要。
-
       if (!loopAround) {
         // ループしない場合の処理 (変更なし)
         nextDisplayIndex = Math.max(
@@ -230,6 +227,19 @@ const useInfiniteCircularScroll = ({
     return () => container.removeEventListener('wheel', onWheel);
   }, [handleWheelOrTouch]);
 
+  // スクロール進捗を計算するイベントリスナー
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const updateScrollProgress = () => {
+      setScrollProgress(container.scrollTop); // スクロールトップ値を直接渡す
+    };
+    container.addEventListener('scroll', updateScrollProgress, {
+      passive: true,
+    });
+    return () => container.removeEventListener('scroll', updateScrollProgress);
+  }, []);
+
   // (オプション) タッチイベントのリスナー (UsagiScrollのように詳細な制御が必要な場合)
   // ここでは簡略化のため省略。必要であればUsagiScrollのonTouchStart, onTouchMove, onTouchEndを参考に実装。
 
@@ -237,6 +247,7 @@ const useInfiniteCircularScroll = ({
     scrollContainerRef,
     displayItems,
     actualCurrentIndex,
+    scrollProgress,
   };
 };
 
