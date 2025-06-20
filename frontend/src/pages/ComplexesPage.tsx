@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/common/molecules/Header';
 import Footer from '../components/common/molecules/Footer';
-import useInfiniteCircularScroll from '../hooks/useInfiniteCircularScroll';
+// import useInfiniteCircularScroll from '../hooks/useInfiniteCircularScroll'; // 今回は直接実装
 import type { Complex } from '../types/complex';
 
 const PageWrapper = styled.div`
@@ -18,6 +18,7 @@ const PageWrapper = styled.div`
 
 const MainContent = styled.main`
   flex-grow: 1;
+  /* max-width: 1200px; */ /* ScrollSnapWrapperが幅を管理 */
   width: 100%;
   display: flex;
   justify-content: center;
@@ -27,8 +28,8 @@ const MainContent = styled.main`
   padding: 0 1rem; /* 上下のpaddingはScrollSnapWrapperで調整 */
 `;
 
-const PageTitle = styled.h1`
-  font-size: 5vw;
+const PageTitle = styled.h2`
+  font-size: 2.25rem;
   font-weight: 700;
   color: #1d1d1f;
 `;
@@ -58,11 +59,25 @@ const ComplexScrollItem = styled.div`
   /* border-top: 1px solid #111; */
 `;
 
+// 個々のコンプレックスを表示するカードコンポーネント（仮）
+const ComplexDisplayCard = styled.div`
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 100%;
+  max-width: 400px; /* カードの最大幅 */
+  h2 {
+    /* ComplexScrollItem内のh2にスタイルを適用 */
+    margin-bottom: 0.5rem;
+  }
+`;
 import { fetchComplexes } from '../services/api';
 
 const ComplexesPage: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // useNavigateフックを取得
 
   // TanStack Query を使用してデータをフェッチ
   const {
@@ -75,10 +90,86 @@ const ComplexesPage: React.FC = () => {
     // staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  const { scrollContainerRef, displayItems, currentVisibleIndex } =
-    useInfiniteCircularScroll({
-      items: complexes,
-    });
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  // displayItemsは循環スクロールのために元のcomplexesを加工したもの
+  const [displayItems, setDisplayItems] = useState<Complex[]>([]);
+  // 実際に表示されているcomplexesの元配列における0-indexedのインデックス
+  const [actualCurrentIndex, setActualCurrentIndex] = useState(0);
+
+  // 無限循環のためのデータ準備と初期スクロール位置設定
+  useEffect(() => {
+    if (complexes.length > 0) {
+      let itemsForDisplay: Complex[] = [];
+      let initialScrollIndex = 0;
+
+      if (complexes.length === 1) {
+        // アイテムが1つの場合、中央に配置するために3つ複製
+        itemsForDisplay = [complexes[0], complexes[0], complexes[0]];
+        initialScrollIndex = 1; // 中央のアイテム
+      } else if (complexes.length > 1) {
+        // 循環のため、最初と最後にダミー要素を追加
+        // [lastItem, item1, item2, ..., lastItem, firstItem]
+        itemsForDisplay = [
+          complexes[complexes.length - 1], // 前のダミー（実際の最後のアイテム）
+          ...complexes, // 実際のアイテム群
+          complexes[0], // 後ろのダミー（実際の最初のアイテム）
+        ];
+        initialScrollIndex = 1; // 実際の最初のアイテム
+      }
+      setDisplayItems(itemsForDisplay);
+      setActualCurrentIndex(0); // 初期表示はcomplexesの0番目
+
+      // 初期スクロール位置を設定
+      // DOMが更新された後に実行するためにsetTimeoutを使用
+      setTimeout(() => {
+        if (scrollContainerRef.current) {
+          const itemHeight = scrollContainerRef.current.clientHeight;
+          scrollContainerRef.current.scrollTop =
+            itemHeight * initialScrollIndex;
+        }
+      }, 0);
+    } else {
+      setDisplayItems([]);
+      setActualCurrentIndex(0);
+    }
+  }, [complexes]);
+
+  const handleScroll = useCallback(() => {
+    if (
+      !scrollContainerRef.current ||
+      displayItems.length <= 1 ||
+      complexes.length === 0
+    )
+      return;
+
+    const container = scrollContainerRef.current;
+    const itemHeight = container.clientHeight; // 各アイテムはコンテナと同じ高さ
+    const currentScrollTop = container.scrollTop;
+
+    // スナップされた現在の表示アイテムのインデックス (displayItemsに対するもの)
+    const snappedDisplayIndex = Math.round(currentScrollTop / itemHeight);
+
+    if (complexes.length === 1) {
+      setActualCurrentIndex(0); // 常に最初のアイテム
+      return;
+    }
+
+    // 循環ロジック: 端に達したら反対側の対応する位置にジャンプ
+    if (snappedDisplayIndex === 0) {
+      // 上端のダミー(N)に来た
+      // 実際の最後のアイテム (N) にジャンプ (displayItemsのインデックスは complexes.length)
+      container.scrollTop = itemHeight * complexes.length;
+      setActualCurrentIndex(complexes.length - 1);
+    } else if (snappedDisplayIndex === displayItems.length - 1) {
+      // 下端のダミー(1)に来た
+      // 実際の最初のアイテム (1) にジャンプ (displayItemsのインデックスは 1)
+      container.scrollTop = itemHeight * 1;
+      setActualCurrentIndex(0);
+    } else {
+      // 通常のスクロール: displayItemsのインデックスからcomplexesのインデックスを計算
+      setActualCurrentIndex(snappedDisplayIndex - 1);
+    }
+  }, [displayItems, complexes.length]);
 
   // TODO: Complex編集画面に実装する
   // 削除ミューテーション
@@ -141,24 +232,22 @@ const ComplexesPage: React.FC = () => {
       <MainContent>
         {/* PageTitleWrapper はスクロールの外に配置するか、各アイテム内に含めるか検討 */}
         {/* <PageTitleWrapper> ... </PageTitleWrapper> */}
-        {!isLoading && !error && complexes.length > 0 && (
-          <ScrollSnapContainer>
-            {/* {displayItems.map((complex, index) => ( */}
-            {complexes.map(
-              (
-                complex,
-                index // まずはcomplexesを直接使用
-              ) => (
-                <ComplexScrollItem key={`${complex.id}-${index}`}>
-                  {/* ここに各コンプレックスの詳細を表示するコンポーネントを配置 */}
-                  {/* 例: <ComplexCard complex={complex} isFocused={index === currentVisibleIndex} /> */}
+        {!isLoading && !error && displayItems.length > 0 && (
+          <ScrollSnapContainer ref={scrollContainerRef} onScroll={handleScroll}>
+            {displayItems.map((complex, index) => (
+              <ComplexScrollItem key={`${complex.id}-display-${index}`}>
+                {/*
+                  ComplexDisplayCardに渡すcomplexはdisplayItemsのもので良い。
+                  isFocusedなどの状態管理はactualCurrentIndexとcomplexesのIDを比較するなどして行う。
+                */}
+                <ComplexDisplayCard>
                   <div>
-                    <PageTitle>{complex.content}</PageTitle>
+                    <h2>{complex.content}</h2>
                     <p>Category: {complex.category}</p>
                   </div>
-                </ComplexScrollItem>
-              )
-            )}
+                </ComplexDisplayCard>
+              </ComplexScrollItem>
+            ))}
           </ScrollSnapContainer>
         )}
         {!isLoading && !error && complexes.length === 0 && (
@@ -166,8 +255,8 @@ const ComplexesPage: React.FC = () => {
         )}
       </MainContent>
       <Footer
-        currentComplexNumber={currentVisibleIndex + 1}
-        totalComplexes={complexes.length}
+        currentComplexNumber={complexes.length > 0 ? actualCurrentIndex + 1 : 0}
+        totalComplexes={complexes.length > 0 ? complexes.length : 0}
       />
     </PageWrapper>
   );
