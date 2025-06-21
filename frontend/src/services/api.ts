@@ -46,6 +46,11 @@ export const createComplex = async (data: ComplexInput): Promise<Complex> => {
   return response.json();
 };
 
+export const fetchComplex = async (id: string): Promise<Complex> => {
+  const response = await fetch(`${API_BASE_URL}/complexes/${id}`);
+  return response.json();
+};
+
 /* Delete complex */
 export const deleteComplex = async (id: number): Promise<void> => {
   const response = await fetch(`${API_BASE_URL}/complexes/${id}`, {
