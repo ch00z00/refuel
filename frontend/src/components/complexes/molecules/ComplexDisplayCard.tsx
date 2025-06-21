@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
 import type { Complex } from '../../../types/complex';
+import Button from '../../common/atoms/Button';
 
 const CardWrapper = styled.div`
   /* 映画館のようなダイナミックなデザイン */
@@ -37,14 +38,25 @@ const CardWrapper = styled.div`
   }
 `;
 
+const DetailsButton = styled(Button)`
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+`;
+
 interface ComplexDisplayCardProps {
   complex: Complex;
   scrollProgress: number; // スクロール進捗を受け取る
+  onViewDetails: (id: number) => void;
 }
 
 const ComplexDisplayCard: React.FC<ComplexDisplayCardProps> = ({
   complex,
   scrollProgress,
+  onViewDetails,
 }) => {
   const { t } = useTranslation();
   const h2Ref = useRef<HTMLHeadingElement>(null);
@@ -73,6 +85,12 @@ const ComplexDisplayCard: React.FC<ComplexDisplayCardProps> = ({
           {t('categoryLabel')}: {complex.category}
         </p>
       </p>
+      <DetailsButton
+        variant="secondary"
+        onClick={() => onViewDetails(complex.id)}
+      >
+        {t('viewDetails')}
+      </DetailsButton>
     </CardWrapper>
   );
 };

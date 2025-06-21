@@ -123,6 +123,10 @@ const ComplexesPage: React.FC = () => {
   } = useInfiniteCircularScroll({ items: complexes, loopAround: true });
 
   // TODO: Complex編集画面に実装する
+  const handleViewDetails = (id: number) => {
+    navigate(`/complexes/${id}`);
+  };
+
   // 削除ミューテーション
   // const deleteMutation = useMutation<void, Error, number>({
   //   mutationFn: deleteComplex,
@@ -190,6 +194,7 @@ const ComplexesPage: React.FC = () => {
                 <ComplexDisplayCard
                   complex={complex}
                   scrollProgress={scrollProgress}
+                  onViewDetails={handleViewDetails}
                 />
               </ComplexScrollItem>
             ))}
