@@ -23,7 +23,6 @@ const MainContent = styled.main`
   display: flex;
   justify-content: center;
   margin: 0 auto;
-  padding: 2rem 1rem;
 `;
 
 const PageTitle = styled.h2`
@@ -34,12 +33,11 @@ const PageTitle = styled.h2`
 
 const ScrollSnapContainer = styled.div`
   width: 100%;
-  max-width: 700px; /* コンテンツの最大幅、UsagiScrollの .c-wrap に近い */
-  height: calc(100vh - 5rem - 5rem); /* Header/Footerを除いた高さ */
+  height: calc(100vh - 5rem - 5rem);
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
   &::-webkit-scrollbar {
     /* Chrome, Safari, Opera */
     display: none;
@@ -47,14 +45,13 @@ const ScrollSnapContainer = styled.div`
 `;
 
 const ComplexScrollItem = styled.div`
-  scroll-snap-align: start; /* 各アイテムの開始位置でスナップ */
-  height: 100%; /* ScrollSnapContainerの高さ一杯に広がる */
+  scroll-snap-align: start;
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  /* UsagiScrollの .c-inner のようなスタイルをここに適用 */
-  /* border-top: 1px solid #111; */
 `;
 
 import { fetchComplexes } from '../services/api';
