@@ -5,6 +5,7 @@ export interface Complex {
   category: string;
   created_at: string;
   updated_at: string;
+  goals: Goal[];
 }
 
 export interface ComplexInput {
@@ -27,5 +28,4 @@ export interface ActionInput {
   category: string;
   created_at: string;
   updated_at: string;
-  goals?: Goal[];
 }
