@@ -135,9 +135,7 @@ const ComplexDetailPage: React.FC = () => {
             complex.goals.map((goal: Goal) => (
               <GoalCard key={goal.id}>
                 <GoalTitle>{t('surfaceGoal')}</GoalTitle>
-                <GoalContent>{goal.surface_goal}</GoalContent>
-                <GoalTitle>{t('underlyingGoal')}</GoalTitle>
-                <GoalContent>{goal.underlying_goal}</GoalContent>
+                <GoalContent>{goal.content}</GoalContent>
                 <ActionsButton
                   onClick={() => navigate(`/goals/${goal.id}/actions`)}
                 >
