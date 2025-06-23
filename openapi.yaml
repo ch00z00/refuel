@@ -329,7 +329,7 @@ components:
      description: 行動完了日時 (完了にする場合は日時を、未完了に戻す場合はnullを指定)
      example: "2023-10-27T10:35:00Z"
 
-  # RecurrencePattern Schema (新規追加)
+  # RecurrencePattern Schema
   RecurrencePattern:
    type: object
    description: 行動の繰り返しパターン
@@ -338,14 +338,28 @@ components:
      type: string
      enum: [daily, weekly, monthly]
      description: 繰り返し頻度
-     example: daily
+    interval:
+     type: integer
+     format: int32
+     description: 繰り返し間隔
+     default: 1
     time_of_day:
      type: string
      format: "HH:MM"
      description: 繰り返しが日単位の場合の時刻
-     example: "09:00"
+    days_of_week:
+     type: array
+     items:
+      type: string
+      enum: [SUN, MON, TUE, WED, THU, FRI, SAT]
+     description: 繰り返しが週単位の場合の曜日
+    day_of_month:
+     type: integer
+     format: int32
+     description: 繰り返しが月単位の場合の日
    required:
     - frequency
+    - interval
     - time_of_day
 
   # Badge Schema
@@ -886,8 +900,8 @@ paths:
    summary: 利用可能なバッジの一覧を取得
    tags:
     - Badges
-   # security: # バッジ一覧は認証なしでも見れるようにするか検討。今回は認証必須とする
-   #  - BearerAuth: []
+   security:
+    - BearerAuth: []
    responses:
     "200":
      description: バッジ一覧の取得成功
@@ -908,7 +922,7 @@ paths:
   get:
    summary: 認証ユーザーが獲得したバッジの一覧を取得
    tags:
-    - Badges # UserBadges タグでも良い
+    - UserBadges
    security:
     - BearerAuth: []
    responses:
