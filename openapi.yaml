@@ -7,11 +7,12 @@ info:
   MVP（Minimum Viable Product）の機能を対象としています。
 
 servers:
- - url: http://localhost:8080/api/v1 # 開発環境のベースURL (例)
+ - url: http://localhost:8080/api/v1
    description: Development server
 
 components:
  schemas:
+  # Error Schema
   Error:
    type: object
    properties:
@@ -24,6 +25,7 @@ components:
     - code
     - message
 
+  # User Schema
   User:
    type: object
    properties:
@@ -32,6 +34,7 @@ components:
      format: uuid
      description: ユーザーID
 
+  # Complex Schema
   Complex:
    type: object
    properties:
@@ -63,6 +66,7 @@ components:
     - created_at
     - updated_at
 
+  # ComplexInput Schema
   ComplexInput:
    type: object
    description: 新しいコンプレックスを登録するための入力
@@ -70,6 +74,9 @@ components:
     content:
      type: string
      description: 言語化されたコンプレックスの内容
+    trigger_episode:
+     type: string
+     description: コンプレックスを意識したきっかけやエピソード
      example: "人前で話すのが極度に苦手"
     category:
      type: string
@@ -79,6 +86,7 @@ components:
     - content
     - category
 
+  # Goal Schema
   Goal:
    type: object
    properties:
@@ -94,12 +102,9 @@ components:
      type: integer
      format: int64
      description: 関連するコンプレックスID
-    surface_goal:
+    content: # 定量的な目標の内容に変更
      type: string
-     description: 表目標の内容
-    underlying_goal:
-     type: string
-     description: 裏目標の内容
+     description: 定量的な目標の内容
     created_at:
      type: string
      format: date-time
@@ -110,11 +115,11 @@ components:
     - id
     - user_id
     - complex_id
-    - surface_goal
-    - underlying_goal
+    - content
     - created_at
     - updated_at
 
+  # GoalInput Schema
   GoalInput:
    type: object
    description: 新しい目標を登録するための入力
@@ -124,19 +129,15 @@ components:
      format: int64
      description: 関連するコンプレックスID
      example: 1
-    surface_goal:
+    content:
      type: string
-     description: 表目標の内容
+     description: 定量的な目標の内容
      example: "会議で週に一度は発言する"
-    underlying_goal:
-     type: string
-     description: 裏目標の内容
-     example: "自分の意見に自信を持つ"
    required:
     - complex_id
-    - surface_goal
-    - underlying_goal
+    - content
 
+  # Action Schema
   Action:
    type: object
    properties:
@@ -160,6 +161,19 @@ components:
      format: date-time
      nullable: true
      description: 行動完了日時 (未完了の場合はnull)
+    recurrence_pattern:
+     $ref: "#/components/schemas/RecurrencePattern"
+     description: 行動の繰り返しパターン
+    gains:
+     type: array
+     items:
+      $ref: "#/components/schemas/Gain"
+     description: この行動に紐づくGainのリスト
+    losses:
+     type: array
+     items:
+      $ref: "#/components/schemas/Loss"
+     description: この行動に紐づくLossのリスト
     created_at:
      type: string
      format: date-time
@@ -171,9 +185,14 @@ components:
     - user_id
     - goal_id
     - content
+    - completed_at
+    - recurrence_pattern
+    - gains
+    - losses
     - created_at
     - updated_at
 
+  # ActionInput Schema
   ActionInput:
    type: object
    description: 新しい行動を記録するための入力
@@ -193,10 +212,143 @@ components:
      nullable: true
      description: 行動完了日時 (記録時に完了していれば設定)
      example: "2023-10-27T10:30:00Z"
+    recurrence_pattern:
+     $ref: "#/components/schemas/RecurrencePattern"
+     description: 行動の繰り返しパターン
+    gains:
+     type: array
+     items:
+      $ref: "#/components/schemas/GainInput"
+     description: この行動に紐づくGainの入力リスト
+    losses:
+     type: array
+     items:
+      $ref: "#/components/schemas/LossInput"
+     description: この行動に紐づくLossの入力リスト
    required:
     - goal_id
     - content
+    - completed_at
+    - recurrence_pattern
+    - gains
+    - losses
 
+  # Gain Schema
+  Gain:
+   type: object
+   properties:
+    id:
+     type: integer
+     format: int64
+     description: Gain ID
+    action_id:
+     type: integer
+     format: int64
+     description: 関連する行動ID
+    type:
+     type: string
+     enum: [quantitative, qualitative] # 定量的か定性的か
+     description: Gainのタイプ
+    description:
+     type: string
+     description: Gainの内容
+   required:
+    - id
+    - action_id
+    - type
+    - description
+
+  # GainInput Schema
+  GainInput:
+   type: object
+   properties:
+    type:
+     type: string
+     enum: [quantitative, qualitative]
+     description: Gainのタイプ
+    description:
+     type: string
+     description: Gainの内容
+   required:
+    - type
+    - description
+
+  # Loss Schema
+  Loss:
+   type: object
+   properties:
+    id:
+     type: integer
+     format: int64
+     description: Loss ID
+    action_id:
+     type: integer
+     format: int64
+     description: 関連する行動ID
+    type:
+     type: string
+     enum: [quantitative, qualitative] # 定量的か定性的か
+     description: Lossのタイプ
+    description:
+     type: string
+     description: Lossの内容
+   required:
+    - id
+    - action_id
+    - type
+    - description
+
+  # LossInput Schema
+  LossInput:
+   type: object
+   properties:
+    type:
+     type: string
+     enum: [quantitative, qualitative]
+     description: Lossのタイプ
+    description:
+     type: string
+     description: Lossの内容
+   required:
+    - type
+    - description
+
+  # ActionUpdateInput Schema
+  ActionUpdateInput:
+   type: object
+   description: 既存の行動を更新するための入力
+   properties:
+    content:
+     type: string
+     description: 行動の内容 (変更する場合に指定)
+     example: "チームミーティングで意見を一つ述べ、さらに質問もした"
+    completed_at:
+     type: string
+     format: date-time
+     nullable: true
+     description: 行動完了日時 (完了にする場合は日時を、未完了に戻す場合はnullを指定)
+     example: "2023-10-27T10:35:00Z"
+
+  # RecurrencePattern Schema (新規追加)
+  RecurrencePattern:
+   type: object
+   description: 行動の繰り返しパターン
+   properties:
+    frequency:
+     type: string
+     enum: [daily, weekly, monthly]
+     description: 繰り返し頻度
+     example: daily
+    time_of_day:
+     type: string
+     format: "HH:MM"
+     description: 繰り返しが日単位の場合の時刻
+     example: "09:00"
+   required:
+    - frequency
+    - time_of_day
+
+  # Badge Schema
   Badge:
    type: object
    properties:
@@ -220,6 +372,7 @@ components:
     - name
     - description
 
+  # UserBadge Schema
   UserBadge:
    type: object
    description: ユーザーが獲得したバッジの情報
@@ -265,7 +418,7 @@ paths:
     - Health
    responses:
     "200":
-     description: 成功応答
+     description: Success response
      content:
       application/json:
        schema:
@@ -666,6 +819,67 @@ paths:
      application/json:
       schema:
        $ref: "#/components/schemas/Error"
+
+ /actions/{actionId}:
+  parameters:
+   - name: actionId
+     in: path
+     required: true
+     description: 操作対象の行動ID
+     schema:
+      type: integer
+      format: int64
+      example: 1
+  put:
+   summary: 既存の行動情報を更新
+   tags:
+    - Actions
+   security:
+    - BearerAuth: []
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/ActionUpdateInput"
+   responses:
+    "200":
+     description: 行動の更新成功
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Action"
+    "400":
+     description: リクエスト不正
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
+    "401":
+     description: 認証エラー
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
+    "404":
+     description: 指定された行動が見つかりません
+    "500":
+     description: サーバー内部エラー
+  delete:
+   summary: 既存の行動を削除
+   tags:
+    - Actions
+   security:
+    - BearerAuth: []
+   responses:
+    "204":
+     description: 行動の削除成功
+    "401":
+     description: 認証エラー
+    "404":
+     description: 指定された行動が見つかりません
+    "500":
+     description: サーバー内部エラー
 
  /badges:
   get:
