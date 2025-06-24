@@ -525,16 +525,18 @@ paths:
       application/json:
        schema:
         $ref: "#/components/schemas/Complex"
-   "401":
-    description: 認証エラー
-    content:
-     application/json:
-      schema:
-       $ref: "#/components/schemas/Error"
     "404":
      description: 指定されたコンプレックスが見つかりません。
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
     "500":
      description: サーバー内部エラー
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
   put:
    summary: 既存のコンプレックス情報を更新します。
    tags:
@@ -556,20 +558,22 @@ paths:
         $ref: "#/components/schemas/Complex"
     "400":
      description: リクエストが不正です。
-    content:
-     application/json:
-      schema:
-       $ref: "#/components/schemas/Error"
-   "401":
-    description: 認証エラー
-    content:
-     application/json:
-      schema:
-       $ref: "#/components/schemas/Error"
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
     "404":
      description: 指定されたコンプレックスが見つかりません。
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
     "500":
      description: サーバー内部エラー
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
   delete:
    summary: 既存のコンプレックスを削除します。
    tags:
@@ -579,16 +583,18 @@ paths:
    responses:
     "204":
      description: コンプレックスが正常に削除されました。
-   "401":
-    description: 認証エラー
-    content:
-     application/json:
-      schema:
-       $ref: "#/components/schemas/Error"
     "404":
      description: 指定されたコンプレックスが見つかりません。
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
     "500":
      description: サーバー内部エラー
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
 
  /goals:
   get:
@@ -679,12 +685,6 @@ paths:
       application/json:
        schema:
         $ref: "#/components/schemas/Goal"
-   "400":
-    description: リクエスト不正 (バリデーションエラーなど)
-    content:
-     application/json:
-      schema:
-       $ref: "#/components/schemas/Error"
     "401":
      description: 認証エラー
      content:
@@ -772,67 +772,55 @@ paths:
         $ref: "#/components/schemas/Action"
     "400":
      description: リクエスト不正
-    content:
-     application/json:
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
+   # GET /actions は要件に応じてフィルタリングパラメータ（例: goal_id, user_id, date_range）を追加検討
+  get:
+   summary: 指定された目標IDに紐づく行動の一覧を取得
+   tags:
+    - Actions
+   security:
+    - BearerAuth: []
+   parameters:
+    - name: goal_id
+      in: query
+      required: true
+      description: 行動を取得する対象の目標ID
       schema:
-       $ref: "#/components/schemas/Error"
-   "401":
-    description: 認証エラー
-    content:
-     application/json:
-      schema:
-       $ref: "#/components/schemas/Error"
-   "500":
-    description: サーバー内部エラー
-    content:
-     application/json:
-      schema:
-       $ref: "#/components/schemas/Error"
- # GET /actions は要件に応じてフィルタリングパラメータ（例: goal_id, user_id, date_range）を追加検討
- get:
-  summary: 指定された目標IDに紐づく行動の一覧を取得
-  tags:
-   - Actions
-  security:
-   - BearerAuth: []
-  parameters:
-   - name: goal_id
-     in: query
-     required: true
-     description: 行動を取得する対象の目標ID
-     schema:
-      type: integer
-      format: int64
-      example: 1
-  responses:
-   "200":
-    description: 行動一覧の取得成功
-    content:
-     application/json:
-      schema:
-       type: array
-       items:
-        $ref: "#/components/schemas/Action"
-   "400":
-    description: リクエスト不正 (goal_idが指定されていない、または無効など)
-    content:
-     application/json:
-      schema:
-       $ref: "#/components/schemas/Error"
-   "401":
-    description: 認証エラー
-    content:
-     application/json:
-      schema:
-       $ref: "#/components/schemas/Error"
-   "404":
-    description: 指定された目標が見つからない、またはその目標に紐づく行動が存在しない
-   "500":
-    description: サーバー内部エラー
-    content:
-     application/json:
-      schema:
-       $ref: "#/components/schemas/Error"
+       type: integer
+       format: int64
+       example: 1
+   responses:
+    "200":
+     description: 行動一覧の取得成功
+     content:
+      application/json:
+       schema:
+        type: array
+        items:
+         $ref: "#/components/schemas/Action"
+    "400":
+     description: リクエスト不正 (goal_idが指定されていない、または無効など)
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
+    "401":
+     description: 認証エラー
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
+    "404":
+     description: 指定された目標が見つからない、またはその目標に紐づく行動が存在しない
+    "500":
+     description: サーバー内部エラー
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
 
  /actions/{actionId}:
   parameters:
@@ -936,13 +924,7 @@ paths:
          $ref: "#/components/schemas/UserBadge"
     "401":
      description: 認証エラー
-    content:
-     application/json:
-      schema:
-       $ref: "#/components/schemas/Error"
-   "500":
-    description: サーバー内部エラー
-    content:
-     application/json:
-      schema:
-       $ref: "#/components/schemas/Error"
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
