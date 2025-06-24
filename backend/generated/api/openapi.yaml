@@ -1,0 +1,1104 @@
+openapi: 3.1.0
+info:
+  description: |
+    コンプレックスを燃料に変える自己進化アプリ「Re:Fuel」のAPI仕様書です。
+    MVP（Minimum Viable Product）の機能を対象としています。
+  title: Re:Fuel API
+  version: v1.0.0
+servers:
+- description: Development server
+  url: http://localhost:8080/api/v1
+tags:
+- description: Operations related to user complexes
+  name: Complexes
+- description: Operations related to user goals
+  name: Goals
+- description: Operations related to user actions
+  name: Actions
+- description: Operations related to badges
+  name: Badges
+- description: API health check
+  name: Health
+paths:
+  /ping:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_ping_get_200_response'
+          description: Success response
+      summary: サーバーの死活監視
+      tags:
+      - Health
+  /complexes:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Complex'
+                type: array
+          description: コンプレックス一覧の取得成功
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 認証エラー
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: サーバー内部エラー
+      security:
+      - BearerAuth: []
+      summary: 登録されているコンプレックスの一覧を取得
+      tags:
+      - Complexes
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComplexInput'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complex'
+          description: コンプレックスの登録成功
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: リクエスト不正 (バリデーションエラーなど)
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: サーバー内部エラー
+      security:
+      - BearerAuth: []
+      summary: 新しいコンプレックスを登録
+      tags:
+      - Complexes
+  /complexes/{complexId}:
+    delete:
+      parameters:
+      - description: 操作対象のコンプレックスID
+        explode: false
+        in: path
+        name: complexId
+        required: true
+        schema:
+          example: 1
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: コンプレックスが正常に削除されました。
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 指定されたコンプレックスが見つかりません。
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: サーバー内部エラー
+      security:
+      - BearerAuth: []
+      summary: 既存のコンプレックスを削除します。
+      tags:
+      - Complexes
+    get:
+      parameters:
+      - description: 操作対象のコンプレックスID
+        explode: false
+        in: path
+        name: complexId
+        required: true
+        schema:
+          example: 1
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complex'
+          description: コンプレックス情報が正常に取得されました。
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 指定されたコンプレックスが見つかりません。
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: サーバー内部エラー
+      security:
+      - BearerAuth: []
+      summary: 指定されたIDのコンプレックス情報を取得します。
+      tags:
+      - Complexes
+    parameters:
+    - description: 操作対象のコンプレックスID
+      explode: false
+      in: path
+      name: complexId
+      required: true
+      schema:
+        example: 1
+        format: int64
+        type: integer
+      style: simple
+    put:
+      parameters:
+      - description: 操作対象のコンプレックスID
+        explode: false
+        in: path
+        name: complexId
+        required: true
+        schema:
+          example: 1
+          format: int64
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComplexInput'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complex'
+          description: コンプレックスが正常に更新されました。
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: リクエストが不正です。
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 指定されたコンプレックスが見つかりません。
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: サーバー内部エラー
+      security:
+      - BearerAuth: []
+      summary: 既存のコンプレックス情報を更新します。
+      tags:
+      - Complexes
+  /goals:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Goal'
+                type: array
+          description: 目標一覧の取得成功
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 認証エラー
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: サーバー内部エラー
+      security:
+      - BearerAuth: []
+      summary: 登録されている目標の一覧を取得
+      tags:
+      - Goals
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoalInput'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+          description: 目標の登録成功
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: リクエスト不正 (バリデーションエラーなど)
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 認証エラー
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: サーバー内部エラー
+      security:
+      - BearerAuth: []
+      summary: 新しい目標を登録
+      tags:
+      - Goals
+  /goals/{goalId}:
+    delete:
+      parameters:
+      - description: 操作対象の目標ID
+        explode: false
+        in: path
+        name: goalId
+        required: true
+        schema:
+          example: 1
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: 目標の削除成功
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 認証エラー
+        "404":
+          description: 指定された目標が見つかりません
+        "500":
+          description: サーバー内部エラー
+      security:
+      - BearerAuth: []
+      summary: 既存の目標を削除
+      tags:
+      - Goals
+    get:
+      parameters:
+      - description: 操作対象の目標ID
+        explode: false
+        in: path
+        name: goalId
+        required: true
+        schema:
+          example: 1
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+          description: 目標情報の取得成功
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 認証エラー
+        "404":
+          description: 指定された目標が見つかりません
+        "500":
+          description: サーバー内部エラー
+      security:
+      - BearerAuth: []
+      summary: 指定されたIDの目標情報を取得
+      tags:
+      - Goals
+    parameters:
+    - description: 操作対象の目標ID
+      explode: false
+      in: path
+      name: goalId
+      required: true
+      schema:
+        example: 1
+        format: int64
+        type: integer
+      style: simple
+    put:
+      parameters:
+      - description: 操作対象の目標ID
+        explode: false
+        in: path
+        name: goalId
+        required: true
+        schema:
+          example: 1
+          format: int64
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoalInput'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+          description: 目標の更新成功
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: リクエスト不正
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 認証エラー
+        "404":
+          description: 指定された目標が見つかりません
+        "500":
+          description: サーバー内部エラー
+      security:
+      - BearerAuth: []
+      summary: 既存の目標情報を更新
+      tags:
+      - Goals
+  /actions:
+    get:
+      parameters:
+      - description: 行動を取得する対象の目標ID
+        explode: true
+        in: query
+        name: goal_id
+        required: true
+        schema:
+          example: 1
+          format: int64
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Action'
+                type: array
+          description: 行動一覧の取得成功
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: リクエスト不正 (goal_idが指定されていない、または無効など)
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 認証エラー
+        "404":
+          description: 指定された目標が見つからない、またはその目標に紐づく行動が存在しない
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: サーバー内部エラー
+      security:
+      - BearerAuth: []
+      summary: 指定された目標IDに紐づく行動の一覧を取得
+      tags:
+      - Actions
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionInput'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Action'
+          description: 行動の記録成功
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: リクエスト不正
+      security:
+      - BearerAuth: []
+      summary: 新しい行動を記録
+      tags:
+      - Actions
+  /actions/{actionId}:
+    delete:
+      parameters:
+      - description: 操作対象の行動ID
+        explode: false
+        in: path
+        name: actionId
+        required: true
+        schema:
+          example: 1
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: 行動の削除成功
+        "401":
+          description: 認証エラー
+        "404":
+          description: 指定された行動が見つかりません
+        "500":
+          description: サーバー内部エラー
+      security:
+      - BearerAuth: []
+      summary: 既存の行動を削除
+      tags:
+      - Actions
+    parameters:
+    - description: 操作対象の行動ID
+      explode: false
+      in: path
+      name: actionId
+      required: true
+      schema:
+        example: 1
+        format: int64
+        type: integer
+      style: simple
+    put:
+      parameters:
+      - description: 操作対象の行動ID
+        explode: false
+        in: path
+        name: actionId
+        required: true
+        schema:
+          example: 1
+          format: int64
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionUpdateInput'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Action'
+          description: 行動の更新成功
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: リクエスト不正
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 認証エラー
+        "404":
+          description: 指定された行動が見つかりません
+        "500":
+          description: サーバー内部エラー
+      security:
+      - BearerAuth: []
+      summary: 既存の行動情報を更新
+      tags:
+      - Actions
+  /badges:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Badge'
+                type: array
+          description: バッジ一覧の取得成功
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: サーバー内部エラー
+      security:
+      - BearerAuth: []
+      summary: 利用可能なバッジの一覧を取得
+      tags:
+      - Badges
+  /me/badges:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UserBadge'
+                type: array
+          description: 獲得バッジ一覧の取得成功
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 認証エラー
+      security:
+      - BearerAuth: []
+      summary: 認証ユーザーが獲得したバッジの一覧を取得
+      tags:
+      - UserBadges
+components:
+  schemas:
+    Error:
+      example:
+        code: 6
+        message: message
+      properties:
+        code:
+          format: int32
+          type: integer
+        message:
+          type: string
+      required:
+      - code
+      - message
+    User:
+      properties:
+        id:
+          description: ユーザーID
+          format: uuid
+          type: string
+    Complex:
+      example:
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        user_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        created_at: 2000-01-23T04:56:07.000+00:00
+        id: 0
+        category: category
+        content: content
+      properties:
+        id:
+          description: コンプレックスID
+          format: int64
+          type: integer
+        user_id:
+          description: ユーザーID
+          format: uuid
+          type: string
+        content:
+          description: 言語化されたコンプレックスの内容
+          type: string
+        category:
+          description: コンプレックスのカテゴリ
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+      required:
+      - category
+      - content
+      - created_at
+      - id
+      - updated_at
+      - user_id
+    ComplexInput:
+      description: 新しいコンプレックスを登録するための入力
+      example:
+        trigger_episode: 人前で話すのが極度に苦手
+        category: 社会性・人間関係
+        content: content
+      properties:
+        content:
+          description: 言語化されたコンプレックスの内容
+          type: string
+        trigger_episode:
+          description: コンプレックスを意識したきっかけやエピソード
+          example: 人前で話すのが極度に苦手
+          type: string
+        category:
+          description: コンプレックスのカテゴリ
+          example: 社会性・人間関係
+          type: string
+      required:
+      - category
+      - content
+    Goal:
+      example:
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        user_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        complex_id: 6
+        created_at: 2000-01-23T04:56:07.000+00:00
+        id: 0
+        content: content
+      properties:
+        id:
+          description: 目標ID
+          format: int64
+          type: integer
+        user_id:
+          description: ユーザーID
+          format: uuid
+          type: string
+        complex_id:
+          description: 関連するコンプレックスID
+          format: int64
+          type: integer
+        content:
+          description: 定量的な目標の内容
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+      required:
+      - complex_id
+      - content
+      - created_at
+      - id
+      - updated_at
+      - user_id
+    GoalInput:
+      description: 新しい目標を登録するための入力
+      example:
+        complex_id: 1
+        content: 会議で週に一度は発言する
+      properties:
+        complex_id:
+          description: 関連するコンプレックスID
+          example: 1
+          format: int64
+          type: integer
+        content:
+          description: 定量的な目標の内容
+          example: 会議で週に一度は発言する
+          type: string
+      required:
+      - complex_id
+      - content
+    Action:
+      example:
+        completed_at: 2000-01-23T04:56:07.000+00:00
+        goal_id: 6
+        recurrence_pattern:
+          days_of_week:
+          - SUN
+          - SUN
+          time_of_day: time_of_day
+          interval: 1
+          day_of_month: 5
+          frequency: daily
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        user_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        created_at: 2000-01-23T04:56:07.000+00:00
+        id: 0
+        losses:
+        - action_id: 9
+          description: description
+          id: 7
+          type: quantitative
+        - action_id: 9
+          description: description
+          id: 7
+          type: quantitative
+        gains:
+        - action_id: 2
+          description: description
+          id: 5
+          type: quantitative
+        - action_id: 2
+          description: description
+          id: 5
+          type: quantitative
+        content: content
+      properties:
+        id:
+          description: 行動ID
+          format: int64
+          type: integer
+        user_id:
+          description: ユーザーID
+          format: uuid
+          type: string
+        goal_id:
+          description: 関連する目標ID
+          format: int64
+          type: integer
+        content:
+          description: 行動の内容
+          type: string
+        completed_at:
+          description: 行動完了日時 (未完了の場合はnull)
+          format: date-time
+          type: string
+          nullable: true
+        recurrence_pattern:
+          $ref: '#/components/schemas/RecurrencePattern'
+        gains:
+          description: この行動に紐づくGainのリスト
+          items:
+            $ref: '#/components/schemas/Gain'
+          type: array
+        losses:
+          description: この行動に紐づくLossのリスト
+          items:
+            $ref: '#/components/schemas/Loss'
+          type: array
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+      required:
+      - completed_at
+      - content
+      - created_at
+      - gains
+      - goal_id
+      - id
+      - losses
+      - recurrence_pattern
+      - updated_at
+      - user_id
+    ActionInput:
+      description: 新しい行動を記録するための入力
+      example:
+        completed_at: 2023-10-27T10:30:00Z
+        goal_id: 1
+        recurrence_pattern:
+          days_of_week:
+          - SUN
+          - SUN
+          time_of_day: time_of_day
+          interval: 1
+          day_of_month: 5
+          frequency: daily
+        losses:
+        - description: description
+          type: quantitative
+        - description: description
+          type: quantitative
+        gains:
+        - description: description
+          type: quantitative
+        - description: description
+          type: quantitative
+        content: 今日のチームミーティングで意見を一つ述べた
+      properties:
+        goal_id:
+          description: 関連する目標ID
+          example: 1
+          format: int64
+          type: integer
+        content:
+          description: 行動の内容
+          example: 今日のチームミーティングで意見を一つ述べた
+          type: string
+        completed_at:
+          description: 行動完了日時 (記録時に完了していれば設定)
+          example: 2023-10-27T10:30:00Z
+          format: date-time
+          type: string
+          nullable: true
+        recurrence_pattern:
+          $ref: '#/components/schemas/RecurrencePattern'
+        gains:
+          description: この行動に紐づくGainの入力リスト
+          items:
+            $ref: '#/components/schemas/GainInput'
+          type: array
+        losses:
+          description: この行動に紐づくLossの入力リスト
+          items:
+            $ref: '#/components/schemas/LossInput'
+          type: array
+      required:
+      - completed_at
+      - content
+      - gains
+      - goal_id
+      - losses
+      - recurrence_pattern
+    Gain:
+      example:
+        action_id: 2
+        description: description
+        id: 5
+        type: quantitative
+      properties:
+        id:
+          description: Gain ID
+          format: int64
+          type: integer
+        action_id:
+          description: 関連する行動ID
+          format: int64
+          type: integer
+        type:
+          description: Gainのタイプ
+          enum:
+          - quantitative
+          - qualitative
+          type: string
+        description:
+          description: Gainの内容
+          type: string
+      required:
+      - action_id
+      - description
+      - id
+      - type
+    GainInput:
+      example:
+        description: description
+        type: quantitative
+      properties:
+        type:
+          description: Gainのタイプ
+          enum:
+          - quantitative
+          - qualitative
+          type: string
+        description:
+          description: Gainの内容
+          type: string
+      required:
+      - description
+      - type
+    Loss:
+      example:
+        action_id: 9
+        description: description
+        id: 7
+        type: quantitative
+      properties:
+        id:
+          description: Loss ID
+          format: int64
+          type: integer
+        action_id:
+          description: 関連する行動ID
+          format: int64
+          type: integer
+        type:
+          description: Lossのタイプ
+          enum:
+          - quantitative
+          - qualitative
+          type: string
+        description:
+          description: Lossの内容
+          type: string
+      required:
+      - action_id
+      - description
+      - id
+      - type
+    LossInput:
+      example:
+        description: description
+        type: quantitative
+      properties:
+        type:
+          description: Lossのタイプ
+          enum:
+          - quantitative
+          - qualitative
+          type: string
+        description:
+          description: Lossの内容
+          type: string
+      required:
+      - description
+      - type
+    ActionUpdateInput:
+      description: 既存の行動を更新するための入力
+      example:
+        completed_at: 2023-10-27T10:35:00Z
+        content: チームミーティングで意見を一つ述べ、さらに質問もした
+      properties:
+        content:
+          description: 行動の内容 (変更する場合に指定)
+          example: チームミーティングで意見を一つ述べ、さらに質問もした
+          type: string
+        completed_at:
+          description: 行動完了日時 (完了にする場合は日時を、未完了に戻す場合はnullを指定)
+          example: 2023-10-27T10:35:00Z
+          format: date-time
+          type: string
+          nullable: true
+    RecurrencePattern:
+      description: 行動の繰り返しパターン
+      example:
+        days_of_week:
+        - SUN
+        - SUN
+        time_of_day: time_of_day
+        interval: 1
+        day_of_month: 5
+        frequency: daily
+      properties:
+        frequency:
+          description: 繰り返し頻度
+          enum:
+          - daily
+          - weekly
+          - monthly
+          type: string
+        interval:
+          default: 1
+          description: 繰り返し間隔
+          format: int32
+          type: integer
+        time_of_day:
+          description: 繰り返しが日単位の場合の時刻
+          format: HH:MM
+          type: string
+        days_of_week:
+          description: 繰り返しが週単位の場合の曜日
+          items:
+            enum:
+            - SUN
+            - MON
+            - TUE
+            - WED
+            - THU
+            - FRI
+            - SAT
+            type: string
+          type: array
+        day_of_month:
+          description: 繰り返しが月単位の場合の日
+          format: int32
+          type: integer
+      required:
+      - frequency
+      - interval
+      - time_of_day
+    Badge:
+      example:
+        icon_url: http://example.com/aeiou
+        name: name
+        description: description
+        id: 0
+      properties:
+        id:
+          description: バッジID
+          format: int64
+          type: integer
+        name:
+          description: バッジ名
+          type: string
+        description:
+          description: バッジの説明
+          type: string
+        icon_url:
+          description: バッジアイコンのURL
+          format: url
+          type: string
+          nullable: true
+      required:
+      - description
+      - id
+      - name
+    UserBadge:
+      description: ユーザーが獲得したバッジの情報
+      example:
+        badge:
+          icon_url: http://example.com/aeiou
+          name: name
+          description: description
+          id: 0
+        user_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        achieved_at: 2000-01-23T04:56:07.000+00:00
+      properties:
+        user_id:
+          description: ユーザーID
+          format: uuid
+          type: string
+        badge:
+          $ref: '#/components/schemas/Badge'
+        achieved_at:
+          description: バッジ獲得日時
+          format: date-time
+          type: string
+      required:
+      - achieved_at
+      - badge
+      - user_id
+    _ping_get_200_response:
+      example:
+        message: pong
+      properties:
+        message:
+          example: pong
+          type: string
+  securitySchemes:
+    BearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
