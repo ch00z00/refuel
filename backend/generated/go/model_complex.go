@@ -3,38 +3,26 @@
 /*
  * Re:Fuel API
  *
- * コンプレックスを燃料に変える自己進化アプリ「Re:Fuel」のAPI仕様書です。 MVP（Minimum Viable Product）の機能を対象としています。 
+ * コンプレックスを燃料に変える自己進化アプリ「Re:Fuel」のAPI仕様書です。 MVP（Minimum Viable Product）の機能を対象としています。
  *
  * API version: v1.0.0
  */
 
 package refuelapi
 
-
 import (
 	"time"
 )
 
-
-
 type Complex struct {
-
-	// コンプレックスID
-	Id int64 `json:"id"`
-
-	// ユーザーID
-	UserId string `json:"user_id"`
-
-	// 言語化されたコンプレックスの内容
-	Content string `json:"content"`
-
-	// コンプレックスのカテゴリ
-	Category string `json:"category"`
-
-	CreatedAt time.Time `json:"created_at"`
-
-	UpdatedAt time.Time `json:"updated_at"`
+	Id        int64     `json:"id,omitempty" gorm:"primarykey"`
+	UserId    string    `json:"user_id,omitempty" gorm:"type:varchar(36);not null;index"`
+	Content   string    `json:"content" gorm:"not null"`
+	Category  string    `json:"category" gorm:"not null"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
+
 
 // AssertComplexRequired checks if the required fields are not zero-ed
 func AssertComplexRequired(obj Complex) error {

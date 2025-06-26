@@ -3,7 +3,7 @@
 /*
  * Re:Fuel API
  *
- * コンプレックスを燃料に変える自己進化アプリ「Re:Fuel」のAPI仕様書です。 MVP（Minimum Viable Product）の機能を対象としています。 
+ * コンプレックスを燃料に変える自己進化アプリ「Re:Fuel」のAPI仕様書です。 MVP（Minimum Viable Product）の機能を対象としています。
  *
  * API version: v1.0.0
  */
@@ -14,31 +14,51 @@ import (
 	"log"
 	"net/http"
 
-	refuelapi "github.com/GIT_USER_ID/GIT_REPO_ID/go"
+	"refuel/backend/app"
+	refuelapi "refuel/backend/generated/go"
 )
 
 func main() {
+	// アプリケーションコンテキストの初期化 (DB接続、バリデーター、マイグレーションなど)
 	log.Printf("Server started")
 
-	ActionsAPIService := refuelapi.NewActionsAPIService()
-	ActionsAPIController := refuelapi.NewActionsAPIController(ActionsAPIService)
+	// ActionsAPIService := refuelapi.NewActionsAPIService()
+	// ActionsAPIController := refuelapi.NewActionsAPIController(ActionsAPIService)
 
-	BadgesAPIService := refuelapi.NewBadgesAPIService()
-	BadgesAPIController := refuelapi.NewBadgesAPIController(BadgesAPIService)
+	// BadgesAPIService := refuelapi.NewBadgesAPIService()
+	// BadgesAPIController := refuelapi.NewBadgesAPIController(BadgesAPIService)
 
-	ComplexesAPIService := refuelapi.NewComplexesAPIService()
-	ComplexesAPIController := refuelapi.NewComplexesAPIController(ComplexesAPIService)
+	// ComplexesAPIService := refuelapi.NewComplexesAPIService()
+	// ComplexesAPIController := refuelapi.NewComplexesAPIController(ComplexesAPIService)
 
-	GoalsAPIService := refuelapi.NewGoalsAPIService()
-	GoalsAPIController := refuelapi.NewGoalsAPIController(GoalsAPIService)
+	// GoalsAPIService := refuelapi.NewGoalsAPIService()
+	// GoalsAPIController := refuelapi.NewGoalsAPIController(GoalsAPIService)
 
-	HealthAPIService := refuelapi.NewHealthAPIService()
-	HealthAPIController := refuelapi.NewHealthAPIController(HealthAPIService)
+	// HealthAPIService := refuelapi.NewHealthAPIService()
+	// HealthAPIController := refuelapi.NewHealthAPIController(HealthAPIService)
 
-	UserBadgesAPIService := refuelapi.NewUserBadgesAPIService()
-	UserBadgesAPIController := refuelapi.NewUserBadgesAPIController(UserBadgesAPIService)
+	// UserBadgesAPIService := refuelapi.NewUserBadgesAPIService() // OpenAPI定義にUserBadgesタグがないためコメントアウト
+	// UserBadgesAPIController := refuelapi.NewUserBadgesAPIController(UserBadgesAPIService)
 
-	router := refuelapi.NewRouter(ActionsAPIController, BadgesAPIController, ComplexesAPIController, GoalsAPIController, HealthAPIController, UserBadgesAPIController)
+	appCtx, err := app.SetupApp()
+	if err != nil {
+		log.Fatalf("Failed to setup application: %v", err)
+	}
+
+	// APIサービスの実装を生成されたコントローラに渡す
+	apiService := app.NewApiService(appCtx.DB, appCtx.Validate)
+
+	router := refuelapi.NewRouter(
+		refuelapi.NewActionsAPIController(apiService),
+		refuelapi.NewBadgesAPIController(apiService),
+		refuelapi.NewComplexesAPIController(apiService),
+		refuelapi.NewGoalsAPIController(apiService),
+		refuelapi.NewHealthAPIController(apiService),
+		// refuelapi.NewUserBadgesAPIController(apiService), // OpenAPI定義にUserBadgesタグがないためコメントアウト
+	)
+
+	// Ginミドルウェアの設定
+	app.SetupGinMiddlewares(router.Engine) // router.EngineでGinルーター本体にアクセス
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
