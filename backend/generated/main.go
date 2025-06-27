@@ -16,49 +16,38 @@ import (
 
 	"refuel/backend/app"
 	refuelapi "refuel/backend/generated/go"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	// アプリケーションコンテキストの初期化 (DB接続、バリデーター、マイグレーションなど)
 	log.Printf("Server started")
 
-	// ActionsAPIService := refuelapi.NewActionsAPIService()
-	// ActionsAPIController := refuelapi.NewActionsAPIController(ActionsAPIService)
+	// Ginルーターの初期化
+	r := gin.Default()
 
-	// BadgesAPIService := refuelapi.NewBadgesAPIService()
-	// BadgesAPIController := refuelapi.NewBadgesAPIController(BadgesAPIService)
-
-	// ComplexesAPIService := refuelapi.NewComplexesAPIService()
-	// ComplexesAPIController := refuelapi.NewComplexesAPIController(ComplexesAPIService)
-
-	// GoalsAPIService := refuelapi.NewGoalsAPIService()
-	// GoalsAPIController := refuelapi.NewGoalsAPIController(GoalsAPIService)
-
-	// HealthAPIService := refuelapi.NewHealthAPIService()
-	// HealthAPIController := refuelapi.NewHealthAPIController(HealthAPIService)
-
-	// UserBadgesAPIService := refuelapi.NewUserBadgesAPIService() // OpenAPI定義にUserBadgesタグがないためコメントアウト
-	// UserBadgesAPIController := refuelapi.NewUserBadgesAPIController(UserBadgesAPIService)
-
+	// アプリケーションコンテキストの初期化 (DB接続、バリデーター、マイグレーションなど)
 	appCtx, err := app.SetupApp()
 	if err != nil {
 		log.Fatalf("Failed to setup application: %v", err)
 	}
 
 	// APIサービスの実装を生成されたコントローラに渡す
-	apiService := app.NewApiService(appCtx.DB, appCtx.Validate)
+	apiService := app.NewAPIService(appCtx.DB, appCtx.Validate)
 
-	router := refuelapi.NewRouter(
+	// ルーティングの設定
+	refuelapi.NewRouter(
 		refuelapi.NewActionsAPIController(apiService),
 		refuelapi.NewBadgesAPIController(apiService),
 		refuelapi.NewComplexesAPIController(apiService),
 		refuelapi.NewGoalsAPIController(apiService),
 		refuelapi.NewHealthAPIController(apiService),
-		// refuelapi.NewUserBadgesAPIController(apiService), // OpenAPI定義にUserBadgesタグがないためコメントアウト
+		refuelapi.NewUserBadgesAPIController(apiService),
 	)
 
 	// Ginミドルウェアの設定
-	app.SetupGinMiddlewares(router.Engine) // router.EngineでGinルーター本体にアクセス
+	app.SetupGinMiddlewares(r)
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":8080", r))
 }

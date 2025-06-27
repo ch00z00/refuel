@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 
 	refuelapi "refuel/backend/generated/go"
+	"refuel/backend/models"
 )
 
 // APIService implements the refuelapi.APIServicer interface.
@@ -639,6 +640,6 @@ func (s *APIService) UpdateGoal(ctx context.Context, goalId int64, goalInput ref
 }
 
 // Ping - サーバーの死活監視
-func (s *AePIService) Ping(ctx context.Context) (refuelapi.ImplResponse) {
+func (s *APIService) Ping(ctx context.Context) (refuelapi.ImplResponse) {
 	return refuelapi.ImplResponse{Code: http.StatusOK, Body: map[string]string{"message": "pong"}}
 }

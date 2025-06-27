@@ -421,6 +421,8 @@ tags:
    description: Operations related to user actions
  - name: Badges
    description: Operations related to badges
+ - name: UserBadges
+   description: Operations related to a user's earned badges
  - name: Health
    description: API health check
 
