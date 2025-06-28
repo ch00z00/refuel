@@ -13,8 +13,8 @@ import (
 	"refuel/backend/models"
 )
 
-// Servicer は、生成されたすべてのAPIサービスインターフェースを埋め込んだ複合インターフェースです。
-// これにより、APIServiceがすべてのAPIエンドポイントを処理できるようになります。
+// Servicer is an interface that defines the methods required to implement the
+// various API endpoints.
 type Servicer interface {
 	refuelapi.ActionsAPIServicer
 	refuelapi.BadgesAPIServicer
@@ -24,7 +24,7 @@ type Servicer interface {
 	refuelapi.UserBadgesAPIServicer
 }
 
-// APIService は、Servicerインターフェースを実装します。
+// APIService implements the Servicer interface.
 type APIService struct {
 	DB       *gorm.DB
 	Validate *validator.Validate
@@ -59,7 +59,7 @@ func GetUserIDFromContext(ctx context.Context) (string, *refuelapi.ImplResponse)
 
 // --- API Service Implementations ---
 
-// CreateAction - 新しい行動を記録
+// CreateAction implements the ActionsAPIServicer interface.
 func (s *APIService) CreateAction(ctx context.Context, actionInput refuelapi.ActionInput) (refuelapi.ImplResponse) {
     userID, resp := GetUserIDFromContext(ctx)
     if resp != nil {

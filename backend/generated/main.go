@@ -3,7 +3,9 @@
 /*
  * Re:Fuel API
  *
- * コンプレックスを燃料に変える自己進化アプリ「Re:Fuel」のAPI仕様書です。 MVP（Minimum Viable Product）の機能を対象としています。 
+ * This is the API specification document for Re:Fuel, an application for
+ * converting complexes into fuel for self-evolution.
+ * It targets the MVP (Minimum Viable Product) features.
  *
  * API version: v1.0.0
  */
@@ -14,31 +16,44 @@ import (
 	"log"
 	"net/http"
 
-	refuelapi "github.com/GIT_USER_ID/GIT_REPO_ID/go"
+	"refuel/backend/app"
+	refuelapi "refuel/backend/generated/go"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	log.Printf("Server started")
 
-	ActionsAPIService := refuelapi.NewActionsAPIService()
-	ActionsAPIController := refuelapi.NewActionsAPIController(ActionsAPIService)
+	// 1. Ginルーターを初期化
+	ginRouter := gin.Default()
 
-	BadgesAPIService := refuelapi.NewBadgesAPIService()
-	BadgesAPIController := refuelapi.NewBadgesAPIController(BadgesAPIService)
+	// 2. アプリケーションコンテキスト（DB接続、バリデーターなど）をセットアップ
+	appCtx, err := app.SetupApp()
+	if err != nil {
+		log.Fatalf("Failed to setup application: %v", err)
+	}
 
-	ComplexesAPIService := refuelapi.NewComplexesAPIService()
-	ComplexesAPIController := refuelapi.NewComplexesAPIController(ComplexesAPIService)
+	// 3. ビジネスロジックを実装したAPIサービスをインスタンス化
+	apiService := app.NewAPIService(appCtx.DB, appCtx.Validate)
 
-	GoalsAPIService := refuelapi.NewGoalsAPIService()
-	GoalsAPIController := refuelapi.NewGoalsAPIController(GoalsAPIService)
+	// 4. 生成されたコントローラーにAPIサービスを渡し、ルーターに登録
+	router := refuelapi.NewRouter(
+		refuelapi.NewActionsAPIController(apiService),
+		refuelapi.NewBadgesAPIController(apiService),
+		refuelapi.NewComplexesAPIController(apiService),
+		refuelapi.NewGoalsAPIController(apiService),
+		refuelapi.NewHealthAPIController(apiService),
+		refuelapi.NewUserBadgesAPIController(apiService),
+	)
 
-	HealthAPIService := refuelapi.NewHealthAPIService()
-	HealthAPIController := refuelapi.NewHealthAPIController(HealthAPIService)
+	// 5. Ginミドルウェア（CORS, Authなど）を設定
+	app.SetupGinMiddlewares(ginRouter)
 
-	UserBadgesAPIService := refuelapi.NewUserBadgesAPIService()
-	UserBadgesAPIController := refuelapi.NewUserBadgesAPIController(UserBadgesAPIService)
+	// 6. 生成されたルーターのハンドラをGinルーターに登録
+	//    openapi-generatorが生成したルーターはhttp.Handlerインターフェースを実装している
+	ginRouter.Any("/*any", gin.WrapH(router))
 
-	router := refuelapi.NewRouter(ActionsAPIController, BadgesAPIController, ComplexesAPIController, GoalsAPIController, HealthAPIController, UserBadgesAPIController)
-
-	log.Fatal(http.ListenAndServe(":8080", router))
+	// 7. サーバーを起動
+	log.Fatal(http.ListenAndServe(":8080", ginRouter))
 }
