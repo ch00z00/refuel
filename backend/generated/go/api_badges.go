@@ -48,17 +48,17 @@ func NewBadgesAPIController(s BadgesAPIServicer, opts ...BadgesAPIOption) *Badge
 // Routes returns all the api routes for the BadgesAPIController
 func (c *BadgesAPIController) Routes() Routes {
 	return Routes{
-		"BadgesGet": Route{
+		"GetBadges": Route{
 			strings.ToUpper("Get"),
 			"/api/v1/badges",
-			c.BadgesGet,
+			c.GetBadges,
 		},
 	}
 }
 
-// BadgesGet - 利用可能なバッジの一覧を取得
-func (c *BadgesAPIController) BadgesGet(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.BadgesGet(r.Context())
+// GetBadges - 利用可能なバッジの一覧を取得
+func (c *BadgesAPIController) GetBadges(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetBadges(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

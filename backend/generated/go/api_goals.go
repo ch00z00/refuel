@@ -51,37 +51,37 @@ func NewGoalsAPIController(s GoalsAPIServicer, opts ...GoalsAPIOption) *GoalsAPI
 // Routes returns all the api routes for the GoalsAPIController
 func (c *GoalsAPIController) Routes() Routes {
 	return Routes{
-		"GoalsGet": Route{
+		"GetGoals": Route{
 			strings.ToUpper("Get"),
 			"/api/v1/goals",
-			c.GoalsGet,
+			c.GetGoals,
 		},
-		"GoalsPost": Route{
+		"CreateGoal": Route{
 			strings.ToUpper("Post"),
 			"/api/v1/goals",
-			c.GoalsPost,
+			c.CreateGoal,
 		},
-		"GoalsGoalIdGet": Route{
+		"GetGoal": Route{
 			strings.ToUpper("Get"),
 			"/api/v1/goals/{goalId}",
-			c.GoalsGoalIdGet,
+			c.GetGoal,
 		},
-		"GoalsGoalIdPut": Route{
+		"UpdateGoal": Route{
 			strings.ToUpper("Put"),
 			"/api/v1/goals/{goalId}",
-			c.GoalsGoalIdPut,
+			c.UpdateGoal,
 		},
-		"GoalsGoalIdDelete": Route{
+		"DeleteGoal": Route{
 			strings.ToUpper("Delete"),
 			"/api/v1/goals/{goalId}",
-			c.GoalsGoalIdDelete,
+			c.DeleteGoal,
 		},
 	}
 }
 
-// GoalsGet - 登録されている目標の一覧を取得
-func (c *GoalsAPIController) GoalsGet(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GoalsGet(r.Context())
+// GetGoals - 登録されている目標の一覧を取得
+func (c *GoalsAPIController) GetGoals(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetGoals(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -91,8 +91,8 @@ func (c *GoalsAPIController) GoalsGet(w http.ResponseWriter, r *http.Request) {
 	_ = EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GoalsPost - 新しい目標を登録
-func (c *GoalsAPIController) GoalsPost(w http.ResponseWriter, r *http.Request) {
+// CreateGoal - 新しい目標を登録
+func (c *GoalsAPIController) CreateGoal(w http.ResponseWriter, r *http.Request) {
 	var goalInputParam GoalInput
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -108,7 +108,7 @@ func (c *GoalsAPIController) GoalsPost(w http.ResponseWriter, r *http.Request) {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.GoalsPost(r.Context(), goalInputParam)
+	result, err := c.service.CreateGoal(r.Context(), goalInputParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -118,8 +118,8 @@ func (c *GoalsAPIController) GoalsPost(w http.ResponseWriter, r *http.Request) {
 	_ = EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GoalsGoalIdGet - 指定されたIDの目標情報を取得
-func (c *GoalsAPIController) GoalsGoalIdGet(w http.ResponseWriter, r *http.Request) {
+// GetGoal - 指定されたIDの目標情報を取得
+func (c *GoalsAPIController) GetGoal(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	goalIdParam, err := parseNumericParameter[int64](
 		params["goalId"],
@@ -129,7 +129,7 @@ func (c *GoalsAPIController) GoalsGoalIdGet(w http.ResponseWriter, r *http.Reque
 		c.errorHandler(w, r, &ParsingError{Param: "goalId", Err: err}, nil)
 		return
 	}
-	result, err := c.service.GoalsGoalIdGet(r.Context(), goalIdParam)
+	result, err := c.service.GetGoal(r.Context(), goalIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -139,8 +139,8 @@ func (c *GoalsAPIController) GoalsGoalIdGet(w http.ResponseWriter, r *http.Reque
 	_ = EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GoalsGoalIdPut - 既存の目標情報を更新
-func (c *GoalsAPIController) GoalsGoalIdPut(w http.ResponseWriter, r *http.Request) {
+// UpdateGoal - 既存の目標情報を更新
+func (c *GoalsAPIController) UpdateGoal(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	goalIdParam, err := parseNumericParameter[int64](
 		params["goalId"],
@@ -165,7 +165,7 @@ func (c *GoalsAPIController) GoalsGoalIdPut(w http.ResponseWriter, r *http.Reque
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.GoalsGoalIdPut(r.Context(), goalIdParam, goalInputParam)
+	result, err := c.service.UpdateGoal(r.Context(), goalIdParam, goalInputParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -175,8 +175,8 @@ func (c *GoalsAPIController) GoalsGoalIdPut(w http.ResponseWriter, r *http.Reque
 	_ = EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GoalsGoalIdDelete - 既存の目標を削除
-func (c *GoalsAPIController) GoalsGoalIdDelete(w http.ResponseWriter, r *http.Request) {
+// DeleteGoal - 既存の目標を削除
+func (c *GoalsAPIController) DeleteGoal(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	goalIdParam, err := parseNumericParameter[int64](
 		params["goalId"],
@@ -186,7 +186,7 @@ func (c *GoalsAPIController) GoalsGoalIdDelete(w http.ResponseWriter, r *http.Re
 		c.errorHandler(w, r, &ParsingError{Param: "goalId", Err: err}, nil)
 		return
 	}
-	result, err := c.service.GoalsGoalIdDelete(r.Context(), goalIdParam)
+	result, err := c.service.DeleteGoal(r.Context(), goalIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

@@ -51,31 +51,31 @@ func NewActionsAPIController(s ActionsAPIServicer, opts ...ActionsAPIOption) *Ac
 // Routes returns all the api routes for the ActionsAPIController
 func (c *ActionsAPIController) Routes() Routes {
 	return Routes{
-		"ActionsGet": Route{
+		"GetActions": Route{
 			strings.ToUpper("Get"),
 			"/api/v1/actions",
-			c.ActionsGet,
+			c.GetActions,
 		},
-		"ActionsPost": Route{
+		"CreateAction": Route{
 			strings.ToUpper("Post"),
 			"/api/v1/actions",
-			c.ActionsPost,
+			c.CreateAction,
 		},
-		"ActionsActionIdPut": Route{
+		"UpdateAction": Route{
 			strings.ToUpper("Put"),
 			"/api/v1/actions/{actionId}",
-			c.ActionsActionIdPut,
+			c.UpdateAction,
 		},
-		"ActionsActionIdDelete": Route{
+		"DeleteAction": Route{
 			strings.ToUpper("Delete"),
 			"/api/v1/actions/{actionId}",
-			c.ActionsActionIdDelete,
+			c.DeleteAction,
 		},
 	}
 }
 
-// ActionsGet - 指定された目標IDに紐づく行動の一覧を取得
-func (c *ActionsAPIController) ActionsGet(w http.ResponseWriter, r *http.Request) {
+// GetActions - 指定された目標IDに紐づく行動の一覧を取得
+func (c *ActionsAPIController) GetActions(w http.ResponseWriter, r *http.Request) {
 	query, err := parseQuery(r.URL.RawQuery)
 	if err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
@@ -97,7 +97,7 @@ func (c *ActionsAPIController) ActionsGet(w http.ResponseWriter, r *http.Request
 		c.errorHandler(w, r, &RequiredError{Field: "goal_id"}, nil)
 		return
 	}
-	result, err := c.service.ActionsGet(r.Context(), goalIdParam)
+	result, err := c.service.GetActions(r.Context(), goalIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -107,8 +107,8 @@ func (c *ActionsAPIController) ActionsGet(w http.ResponseWriter, r *http.Request
 	_ = EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// ActionsPost - 新しい行動を記録
-func (c *ActionsAPIController) ActionsPost(w http.ResponseWriter, r *http.Request) {
+// CreateAction - 新しい行動を記録
+func (c *ActionsAPIController) CreateAction(w http.ResponseWriter, r *http.Request) {
 	var actionInputParam ActionInput
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -124,7 +124,7 @@ func (c *ActionsAPIController) ActionsPost(w http.ResponseWriter, r *http.Reques
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.ActionsPost(r.Context(), actionInputParam)
+	result, err := c.service.CreateAction(r.Context(), actionInputParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -134,8 +134,8 @@ func (c *ActionsAPIController) ActionsPost(w http.ResponseWriter, r *http.Reques
 	_ = EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// ActionsActionIdPut - 既存の行動情報を更新
-func (c *ActionsAPIController) ActionsActionIdPut(w http.ResponseWriter, r *http.Request) {
+// UpdateAction - 既存の行動情報を更新
+func (c *ActionsAPIController) UpdateAction(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	actionIdParam, err := parseNumericParameter[int64](
 		params["actionId"],
@@ -160,7 +160,7 @@ func (c *ActionsAPIController) ActionsActionIdPut(w http.ResponseWriter, r *http
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.ActionsActionIdPut(r.Context(), actionIdParam, actionUpdateInputParam)
+	result, err := c.service.UpdateAction(r.Context(), actionIdParam, actionUpdateInputParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -170,8 +170,8 @@ func (c *ActionsAPIController) ActionsActionIdPut(w http.ResponseWriter, r *http
 	_ = EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// ActionsActionIdDelete - 既存の行動を削除
-func (c *ActionsAPIController) ActionsActionIdDelete(w http.ResponseWriter, r *http.Request) {
+// DeleteAction - 既存の行動を削除
+func (c *ActionsAPIController) DeleteAction(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	actionIdParam, err := parseNumericParameter[int64](
 		params["actionId"],
@@ -181,7 +181,7 @@ func (c *ActionsAPIController) ActionsActionIdDelete(w http.ResponseWriter, r *h
 		c.errorHandler(w, r, &ParsingError{Param: "actionId", Err: err}, nil)
 		return
 	}
-	result, err := c.service.ActionsActionIdDelete(r.Context(), actionIdParam)
+	result, err := c.service.DeleteAction(r.Context(), actionIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

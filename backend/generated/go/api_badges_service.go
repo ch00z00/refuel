@@ -27,9 +27,9 @@ func NewBadgesAPIService() *BadgesAPIService {
 	return &BadgesAPIService{}
 }
 
-// BadgesGet - 利用可能なバッジの一覧を取得
-func (s *BadgesAPIService) BadgesGet(ctx context.Context) (ImplResponse, error) {
-	// TODO - update BadgesGet with the required logic for this service method.
+// GetBadges - 利用可能なバッジの一覧を取得
+func (s *BadgesAPIService) GetBadges(ctx context.Context) (ImplResponse, error) {
+	// TODO - update GetBadges with the required logic for this service method.
 	// Add api_badges_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
 	// TODO: Uncomment the next line to return response Response(200, []Badge{}) or use other options such as http.Ok ...
@@ -38,5 +38,5 @@ func (s *BadgesAPIService) BadgesGet(ctx context.Context) (ImplResponse, error) 
 	// TODO: Uncomment the next line to return response Response(500, Error{}) or use other options such as http.Ok ...
 	// return Response(500, Error{}), nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("BadgesGet method not implemented")
+	return Response(http.StatusNotImplemented, nil), errors.New("GetBadges method not implemented")
 }

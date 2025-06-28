@@ -51,37 +51,37 @@ func NewComplexesAPIController(s ComplexesAPIServicer, opts ...ComplexesAPIOptio
 // Routes returns all the api routes for the ComplexesAPIController
 func (c *ComplexesAPIController) Routes() Routes {
 	return Routes{
-		"ComplexesGet": Route{
+		"GetComplexes": Route{
 			strings.ToUpper("Get"),
 			"/api/v1/complexes",
-			c.ComplexesGet,
+			c.GetComplexes,
 		},
-		"ComplexesPost": Route{
+		"CreateComplex": Route{
 			strings.ToUpper("Post"),
 			"/api/v1/complexes",
-			c.ComplexesPost,
+			c.CreateComplex,
 		},
-		"ComplexesComplexIdGet": Route{
+		"GetComplex": Route{
 			strings.ToUpper("Get"),
 			"/api/v1/complexes/{complexId}",
-			c.ComplexesComplexIdGet,
+			c.GetComplex,
 		},
-		"ComplexesComplexIdPut": Route{
+		"UpdateComplex": Route{
 			strings.ToUpper("Put"),
 			"/api/v1/complexes/{complexId}",
-			c.ComplexesComplexIdPut,
+			c.UpdateComplex,
 		},
-		"ComplexesComplexIdDelete": Route{
+		"DeleteComplex": Route{
 			strings.ToUpper("Delete"),
 			"/api/v1/complexes/{complexId}",
-			c.ComplexesComplexIdDelete,
+			c.DeleteComplex,
 		},
 	}
 }
 
-// ComplexesGet - 登録されているコンプレックスの一覧を取得
-func (c *ComplexesAPIController) ComplexesGet(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.ComplexesGet(r.Context())
+// GetComplexes - 登録されているコンプレックスの一覧を取得
+func (c *ComplexesAPIController) GetComplexes(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetComplexes(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -91,8 +91,8 @@ func (c *ComplexesAPIController) ComplexesGet(w http.ResponseWriter, r *http.Req
 	_ = EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// ComplexesPost - 新しいコンプレックスを登録
-func (c *ComplexesAPIController) ComplexesPost(w http.ResponseWriter, r *http.Request) {
+// CreateComplex - 新しいコンプレックスを登録
+func (c *ComplexesAPIController) CreateComplex(w http.ResponseWriter, r *http.Request) {
 	var complexInputParam ComplexInput
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -108,7 +108,7 @@ func (c *ComplexesAPIController) ComplexesPost(w http.ResponseWriter, r *http.Re
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.ComplexesPost(r.Context(), complexInputParam)
+	result, err := c.service.CreateComplex(r.Context(), complexInputParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -118,8 +118,8 @@ func (c *ComplexesAPIController) ComplexesPost(w http.ResponseWriter, r *http.Re
 	_ = EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// ComplexesComplexIdGet - 指定されたIDのコンプレックス情報を取得します。
-func (c *ComplexesAPIController) ComplexesComplexIdGet(w http.ResponseWriter, r *http.Request) {
+// GetComplex - 指定されたIDのコンプレックス情報を取得します。
+func (c *ComplexesAPIController) GetComplex(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	complexIdParam, err := parseNumericParameter[int64](
 		params["complexId"],
@@ -129,7 +129,7 @@ func (c *ComplexesAPIController) ComplexesComplexIdGet(w http.ResponseWriter, r 
 		c.errorHandler(w, r, &ParsingError{Param: "complexId", Err: err}, nil)
 		return
 	}
-	result, err := c.service.ComplexesComplexIdGet(r.Context(), complexIdParam)
+	result, err := c.service.GetComplex(r.Context(), complexIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -139,8 +139,8 @@ func (c *ComplexesAPIController) ComplexesComplexIdGet(w http.ResponseWriter, r 
 	_ = EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// ComplexesComplexIdPut - 既存のコンプレックス情報を更新します。
-func (c *ComplexesAPIController) ComplexesComplexIdPut(w http.ResponseWriter, r *http.Request) {
+// UpdateComplex - 既存のコンプレックス情報を更新します。
+func (c *ComplexesAPIController) UpdateComplex(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	complexIdParam, err := parseNumericParameter[int64](
 		params["complexId"],
@@ -165,7 +165,7 @@ func (c *ComplexesAPIController) ComplexesComplexIdPut(w http.ResponseWriter, r 
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.ComplexesComplexIdPut(r.Context(), complexIdParam, complexInputParam)
+	result, err := c.service.UpdateComplex(r.Context(), complexIdParam, complexInputParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -175,8 +175,8 @@ func (c *ComplexesAPIController) ComplexesComplexIdPut(w http.ResponseWriter, r 
 	_ = EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// ComplexesComplexIdDelete - 既存のコンプレックスを削除します。
-func (c *ComplexesAPIController) ComplexesComplexIdDelete(w http.ResponseWriter, r *http.Request) {
+// DeleteComplex - 既存のコンプレックスを削除します。
+func (c *ComplexesAPIController) DeleteComplex(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	complexIdParam, err := parseNumericParameter[int64](
 		params["complexId"],
@@ -186,7 +186,7 @@ func (c *ComplexesAPIController) ComplexesComplexIdDelete(w http.ResponseWriter,
 		c.errorHandler(w, r, &ParsingError{Param: "complexId", Err: err}, nil)
 		return
 	}
-	result, err := c.service.ComplexesComplexIdDelete(r.Context(), complexIdParam)
+	result, err := c.service.DeleteComplex(r.Context(), complexIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

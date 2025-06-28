@@ -430,6 +430,7 @@ paths:
  /ping:
   get:
    summary: サーバーの死活監視
+   operationId: ping
    tags:
     - Health
    responses:
@@ -447,6 +448,7 @@ paths:
  /complexes:
   get:
    summary: 登録されているコンプレックスの一覧を取得
+   operationId: getComplexes
    tags:
     - Complexes
    security:
@@ -474,6 +476,7 @@ paths:
         $ref: "#/components/schemas/Error"
   post:
    summary: 新しいコンプレックスを登録
+   operationId: createComplex
    tags:
     - Complexes
    security:
@@ -516,6 +519,7 @@ paths:
       example: 1
   get:
    summary: 指定されたIDのコンプレックス情報を取得します。
+   operationId: getComplex
    tags:
     - Complexes
    security:
@@ -541,6 +545,7 @@ paths:
         $ref: "#/components/schemas/Error"
   put:
    summary: 既存のコンプレックス情報を更新します。
+   operationId: updateComplex
    tags:
     - Complexes
    security:
@@ -578,6 +583,7 @@ paths:
         $ref: "#/components/schemas/Error"
   delete:
    summary: 既存のコンプレックスを削除します。
+   operationId: deleteComplex
    tags:
     - Complexes
    security:
@@ -601,6 +607,7 @@ paths:
  /goals:
   get:
    summary: 登録されている目標の一覧を取得
+   operationId: getGoals
    tags:
     - Goals
    security:
@@ -628,6 +635,7 @@ paths:
         $ref: "#/components/schemas/Error"
   post:
    summary: 新しい目標を登録
+   operationId: createGoal
    tags:
     - Goals
    security:
@@ -676,6 +684,7 @@ paths:
       example: 1
   get:
    summary: 指定されたIDの目標情報を取得
+   operationId: getGoal
    tags:
     - Goals
    security:
@@ -699,6 +708,7 @@ paths:
      description: サーバー内部エラー
   put:
    summary: 既存の目標情報を更新
+   operationId: updateGoal
    tags:
     - Goals
    security:
@@ -734,6 +744,7 @@ paths:
      description: サーバー内部エラー
   delete:
    summary: 既存の目標を削除
+   operationId: deleteGoal
    tags:
     - Goals
    security:
@@ -755,6 +766,7 @@ paths:
  /actions:
   post:
    summary: 新しい行動を記録
+   operationId: createAction
    tags:
     - Actions
    security:
@@ -781,6 +793,7 @@ paths:
    # GET /actions は要件に応じてフィルタリングパラメータ（例: goal_id, user_id, date_range）を追加検討
   get:
    summary: 指定された目標IDに紐づく行動の一覧を取得
+   operationId: getActions
    tags:
     - Actions
    security:
@@ -836,6 +849,7 @@ paths:
       example: 1
   put:
    summary: 既存の行動情報を更新
+   operationId: updateAction
    tags:
     - Actions
    security:
@@ -871,6 +885,7 @@ paths:
      description: サーバー内部エラー
   delete:
    summary: 既存の行動を削除
+   operationId: deleteAction
    tags:
     - Actions
    security:
@@ -888,6 +903,7 @@ paths:
  /badges:
   get:
    summary: 利用可能なバッジの一覧を取得
+   operationId: getBadges
    tags:
     - Badges
    security:
@@ -911,6 +927,7 @@ paths:
  /me/badges:
   get:
    summary: 認証ユーザーが獲得したバッジの一覧を取得
+   operationId: getUserBadges
    tags:
     - UserBadges
    security:

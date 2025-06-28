@@ -3,7 +3,7 @@
 /*
  * Re:Fuel API
  *
- * コンプレックスを燃料に変える自己進化アプリ「Re:Fuel」のAPI仕様書です。 MVP（Minimum Viable Product）の機能を対象としています。
+ * コンプレックスを燃料に変える自己進化アプリ「Re:Fuel」のAPI仕様書です。 MVP（Minimum Viable Product）の機能を対象としています。 
  *
  * API version: v1.0.0
  */
@@ -14,40 +14,31 @@ import (
 	"log"
 	"net/http"
 
-	"refuel/backend/app"
-	refuelapi "refuel/backend/generated/go"
-
-	"github.com/gin-gonic/gin"
+	refuelapi "github.com/GIT_USER_ID/GIT_REPO_ID/go"
 )
 
 func main() {
-	// アプリケーションコンテキストの初期化 (DB接続、バリデーター、マイグレーションなど)
 	log.Printf("Server started")
 
-	// Ginルーターの初期化
-	r := gin.Default()
+	ActionsAPIService := refuelapi.NewActionsAPIService()
+	ActionsAPIController := refuelapi.NewActionsAPIController(ActionsAPIService)
 
-	// アプリケーションコンテキストの初期化 (DB接続、バリデーター、マイグレーションなど)
-	appCtx, err := app.SetupApp()
-	if err != nil {
-		log.Fatalf("Failed to setup application: %v", err)
-	}
+	BadgesAPIService := refuelapi.NewBadgesAPIService()
+	BadgesAPIController := refuelapi.NewBadgesAPIController(BadgesAPIService)
 
-	// APIサービスの実装を生成されたコントローラに渡す
-	apiService := app.NewAPIService(appCtx.DB, appCtx.Validate)
+	ComplexesAPIService := refuelapi.NewComplexesAPIService()
+	ComplexesAPIController := refuelapi.NewComplexesAPIController(ComplexesAPIService)
 
-	// ルーティングの設定
-	refuelapi.NewRouter(
-		refuelapi.NewActionsAPIController(apiService),
-		refuelapi.NewBadgesAPIController(apiService),
-		refuelapi.NewComplexesAPIController(apiService),
-		refuelapi.NewGoalsAPIController(apiService),
-		refuelapi.NewHealthAPIController(apiService),
-		refuelapi.NewUserBadgesAPIController(apiService),
-	)
+	GoalsAPIService := refuelapi.NewGoalsAPIService()
+	GoalsAPIController := refuelapi.NewGoalsAPIController(GoalsAPIService)
 
-	// Ginミドルウェアの設定
-	app.SetupGinMiddlewares(r)
+	HealthAPIService := refuelapi.NewHealthAPIService()
+	HealthAPIController := refuelapi.NewHealthAPIController(HealthAPIService)
 
-	log.Fatal(http.ListenAndServe(":8080", r))
+	UserBadgesAPIService := refuelapi.NewUserBadgesAPIService()
+	UserBadgesAPIController := refuelapi.NewUserBadgesAPIController(UserBadgesAPIService)
+
+	router := refuelapi.NewRouter(ActionsAPIController, BadgesAPIController, ComplexesAPIController, GoalsAPIController, HealthAPIController, UserBadgesAPIController)
+
+	log.Fatal(http.ListenAndServe(":8080", router))
 }

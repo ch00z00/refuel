@@ -27,9 +27,9 @@ func NewGoalsAPIService() *GoalsAPIService {
 	return &GoalsAPIService{}
 }
 
-// GoalsGet - 登録されている目標の一覧を取得
-func (s *GoalsAPIService) GoalsGet(ctx context.Context) (ImplResponse, error) {
-	// TODO - update GoalsGet with the required logic for this service method.
+// GetGoals - 登録されている目標の一覧を取得
+func (s *GoalsAPIService) GetGoals(ctx context.Context) (ImplResponse, error) {
+	// TODO - update GetGoals with the required logic for this service method.
 	// Add api_goals_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
 	// TODO: Uncomment the next line to return response Response(200, []Goal{}) or use other options such as http.Ok ...
@@ -41,12 +41,12 @@ func (s *GoalsAPIService) GoalsGet(ctx context.Context) (ImplResponse, error) {
 	// TODO: Uncomment the next line to return response Response(500, Error{}) or use other options such as http.Ok ...
 	// return Response(500, Error{}), nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GoalsGet method not implemented")
+	return Response(http.StatusNotImplemented, nil), errors.New("GetGoals method not implemented")
 }
 
-// GoalsPost - 新しい目標を登録
-func (s *GoalsAPIService) GoalsPost(ctx context.Context, goalInput GoalInput) (ImplResponse, error) {
-	// TODO - update GoalsPost with the required logic for this service method.
+// CreateGoal - 新しい目標を登録
+func (s *GoalsAPIService) CreateGoal(ctx context.Context, goalInput GoalInput) (ImplResponse, error) {
+	// TODO - update CreateGoal with the required logic for this service method.
 	// Add api_goals_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
 	// TODO: Uncomment the next line to return response Response(201, Goal{}) or use other options such as http.Ok ...
@@ -61,12 +61,12 @@ func (s *GoalsAPIService) GoalsPost(ctx context.Context, goalInput GoalInput) (I
 	// TODO: Uncomment the next line to return response Response(500, Error{}) or use other options such as http.Ok ...
 	// return Response(500, Error{}), nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GoalsPost method not implemented")
+	return Response(http.StatusNotImplemented, nil), errors.New("CreateGoal method not implemented")
 }
 
-// GoalsGoalIdGet - 指定されたIDの目標情報を取得
-func (s *GoalsAPIService) GoalsGoalIdGet(ctx context.Context, goalId int64) (ImplResponse, error) {
-	// TODO - update GoalsGoalIdGet with the required logic for this service method.
+// GetGoal - 指定されたIDの目標情報を取得
+func (s *GoalsAPIService) GetGoal(ctx context.Context, goalId int64) (ImplResponse, error) {
+	// TODO - update GetGoal with the required logic for this service method.
 	// Add api_goals_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
 	// TODO: Uncomment the next line to return response Response(200, Goal{}) or use other options such as http.Ok ...
@@ -81,12 +81,12 @@ func (s *GoalsAPIService) GoalsGoalIdGet(ctx context.Context, goalId int64) (Imp
 	// TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
 	// return Response(500, nil),nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GoalsGoalIdGet method not implemented")
+	return Response(http.StatusNotImplemented, nil), errors.New("GetGoal method not implemented")
 }
 
-// GoalsGoalIdPut - 既存の目標情報を更新
-func (s *GoalsAPIService) GoalsGoalIdPut(ctx context.Context, goalId int64, goalInput GoalInput) (ImplResponse, error) {
-	// TODO - update GoalsGoalIdPut with the required logic for this service method.
+// UpdateGoal - 既存の目標情報を更新
+func (s *GoalsAPIService) UpdateGoal(ctx context.Context, goalId int64, goalInput GoalInput) (ImplResponse, error) {
+	// TODO - update UpdateGoal with the required logic for this service method.
 	// Add api_goals_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
 	// TODO: Uncomment the next line to return response Response(200, Goal{}) or use other options such as http.Ok ...
@@ -104,12 +104,12 @@ func (s *GoalsAPIService) GoalsGoalIdPut(ctx context.Context, goalId int64, goal
 	// TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
 	// return Response(500, nil),nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GoalsGoalIdPut method not implemented")
+	return Response(http.StatusNotImplemented, nil), errors.New("UpdateGoal method not implemented")
 }
 
-// GoalsGoalIdDelete - 既存の目標を削除
-func (s *GoalsAPIService) GoalsGoalIdDelete(ctx context.Context, goalId int64) (ImplResponse, error) {
-	// TODO - update GoalsGoalIdDelete with the required logic for this service method.
+// DeleteGoal - 既存の目標を削除
+func (s *GoalsAPIService) DeleteGoal(ctx context.Context, goalId int64) (ImplResponse, error) {
+	// TODO - update DeleteGoal with the required logic for this service method.
 	// Add api_goals_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
 	// TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
@@ -124,5 +124,5 @@ func (s *GoalsAPIService) GoalsGoalIdDelete(ctx context.Context, goalId int64) (
 	// TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
 	// return Response(500, nil),nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GoalsGoalIdDelete method not implemented")
+	return Response(http.StatusNotImplemented, nil), errors.New("DeleteGoal method not implemented")
 }

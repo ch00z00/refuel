@@ -27,9 +27,9 @@ func NewComplexesAPIService() *ComplexesAPIService {
 	return &ComplexesAPIService{}
 }
 
-// ComplexesGet - 登録されているコンプレックスの一覧を取得
-func (s *ComplexesAPIService) ComplexesGet(ctx context.Context) (ImplResponse, error) {
-	// TODO - update ComplexesGet with the required logic for this service method.
+// GetComplexes - 登録されているコンプレックスの一覧を取得
+func (s *ComplexesAPIService) GetComplexes(ctx context.Context) (ImplResponse, error) {
+	// TODO - update GetComplexes with the required logic for this service method.
 	// Add api_complexes_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
 	// TODO: Uncomment the next line to return response Response(200, []Complex{}) or use other options such as http.Ok ...
@@ -41,12 +41,12 @@ func (s *ComplexesAPIService) ComplexesGet(ctx context.Context) (ImplResponse, e
 	// TODO: Uncomment the next line to return response Response(500, Error{}) or use other options such as http.Ok ...
 	// return Response(500, Error{}), nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("ComplexesGet method not implemented")
+	return Response(http.StatusNotImplemented, nil), errors.New("GetComplexes method not implemented")
 }
 
-// ComplexesPost - 新しいコンプレックスを登録
-func (s *ComplexesAPIService) ComplexesPost(ctx context.Context, complexInput ComplexInput) (ImplResponse, error) {
-	// TODO - update ComplexesPost with the required logic for this service method.
+// CreateComplex - 新しいコンプレックスを登録
+func (s *ComplexesAPIService) CreateComplex(ctx context.Context, complexInput ComplexInput) (ImplResponse, error) {
+	// TODO - update CreateComplex with the required logic for this service method.
 	// Add api_complexes_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
 	// TODO: Uncomment the next line to return response Response(201, Complex{}) or use other options such as http.Ok ...
@@ -58,12 +58,12 @@ func (s *ComplexesAPIService) ComplexesPost(ctx context.Context, complexInput Co
 	// TODO: Uncomment the next line to return response Response(500, Error{}) or use other options such as http.Ok ...
 	// return Response(500, Error{}), nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("ComplexesPost method not implemented")
+	return Response(http.StatusNotImplemented, nil), errors.New("CreateComplex method not implemented")
 }
 
-// ComplexesComplexIdGet - 指定されたIDのコンプレックス情報を取得します。
-func (s *ComplexesAPIService) ComplexesComplexIdGet(ctx context.Context, complexId int64) (ImplResponse, error) {
-	// TODO - update ComplexesComplexIdGet with the required logic for this service method.
+// GetComplex - 指定されたIDのコンプレックス情報を取得します。
+func (s *ComplexesAPIService) GetComplex(ctx context.Context, complexId int64) (ImplResponse, error) {
+	// TODO - update GetComplex with the required logic for this service method.
 	// Add api_complexes_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
 	// TODO: Uncomment the next line to return response Response(200, Complex{}) or use other options such as http.Ok ...
@@ -75,12 +75,12 @@ func (s *ComplexesAPIService) ComplexesComplexIdGet(ctx context.Context, complex
 	// TODO: Uncomment the next line to return response Response(500, Error{}) or use other options such as http.Ok ...
 	// return Response(500, Error{}), nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("ComplexesComplexIdGet method not implemented")
+	return Response(http.StatusNotImplemented, nil), errors.New("GetComplex method not implemented")
 }
 
-// ComplexesComplexIdPut - 既存のコンプレックス情報を更新します。
-func (s *ComplexesAPIService) ComplexesComplexIdPut(ctx context.Context, complexId int64, complexInput ComplexInput) (ImplResponse, error) {
-	// TODO - update ComplexesComplexIdPut with the required logic for this service method.
+// UpdateComplex - 既存のコンプレックス情報を更新します。
+func (s *ComplexesAPIService) UpdateComplex(ctx context.Context, complexId int64, complexInput ComplexInput) (ImplResponse, error) {
+	// TODO - update UpdateComplex with the required logic for this service method.
 	// Add api_complexes_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
 	// TODO: Uncomment the next line to return response Response(200, Complex{}) or use other options such as http.Ok ...
@@ -95,12 +95,12 @@ func (s *ComplexesAPIService) ComplexesComplexIdPut(ctx context.Context, complex
 	// TODO: Uncomment the next line to return response Response(500, Error{}) or use other options such as http.Ok ...
 	// return Response(500, Error{}), nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("ComplexesComplexIdPut method not implemented")
+	return Response(http.StatusNotImplemented, nil), errors.New("UpdateComplex method not implemented")
 }
 
-// ComplexesComplexIdDelete - 既存のコンプレックスを削除します。
-func (s *ComplexesAPIService) ComplexesComplexIdDelete(ctx context.Context, complexId int64) (ImplResponse, error) {
-	// TODO - update ComplexesComplexIdDelete with the required logic for this service method.
+// DeleteComplex - 既存のコンプレックスを削除します。
+func (s *ComplexesAPIService) DeleteComplex(ctx context.Context, complexId int64) (ImplResponse, error) {
+	// TODO - update DeleteComplex with the required logic for this service method.
 	// Add api_complexes_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
 	// TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
@@ -112,5 +112,5 @@ func (s *ComplexesAPIService) ComplexesComplexIdDelete(ctx context.Context, comp
 	// TODO: Uncomment the next line to return response Response(500, Error{}) or use other options such as http.Ok ...
 	// return Response(500, Error{}), nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("ComplexesComplexIdDelete method not implemented")
+	return Response(http.StatusNotImplemented, nil), errors.New("DeleteComplex method not implemented")
 }

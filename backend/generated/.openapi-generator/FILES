@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 Dockerfile
 README.md
 api/openapi.yaml
@@ -20,7 +19,6 @@ go/error.go
 go/helpers.go
 go/impl.go
 go/logger.go
-go/model__ping_get_200_response.go
 go/model_action.go
 go/model_action_input.go
 go/model_action_update_input.go
@@ -34,6 +32,7 @@ go/model_goal.go
 go/model_goal_input.go
 go/model_loss.go
 go/model_loss_input.go
+go/model_ping_200_response.go
 go/model_recurrence_pattern.go
 go/model_user.go
 go/model_user_badge.go

@@ -21,48 +21,48 @@ import (
 // The ActionsAPIRouter implementation should parse necessary information from the http request,
 // pass the data to a ActionsAPIServicer to perform the required actions, then write the service results to the http response.
 type ActionsAPIRouter interface { 
-	ActionsGet(http.ResponseWriter, *http.Request)
-	ActionsPost(http.ResponseWriter, *http.Request)
-	ActionsActionIdPut(http.ResponseWriter, *http.Request)
-	ActionsActionIdDelete(http.ResponseWriter, *http.Request)
+	GetActions(http.ResponseWriter, *http.Request)
+	CreateAction(http.ResponseWriter, *http.Request)
+	UpdateAction(http.ResponseWriter, *http.Request)
+	DeleteAction(http.ResponseWriter, *http.Request)
 }
 // BadgesAPIRouter defines the required methods for binding the api requests to a responses for the BadgesAPI
 // The BadgesAPIRouter implementation should parse necessary information from the http request,
 // pass the data to a BadgesAPIServicer to perform the required actions, then write the service results to the http response.
 type BadgesAPIRouter interface { 
-	BadgesGet(http.ResponseWriter, *http.Request)
+	GetBadges(http.ResponseWriter, *http.Request)
 }
 // ComplexesAPIRouter defines the required methods for binding the api requests to a responses for the ComplexesAPI
 // The ComplexesAPIRouter implementation should parse necessary information from the http request,
 // pass the data to a ComplexesAPIServicer to perform the required actions, then write the service results to the http response.
 type ComplexesAPIRouter interface { 
-	ComplexesGet(http.ResponseWriter, *http.Request)
-	ComplexesPost(http.ResponseWriter, *http.Request)
-	ComplexesComplexIdGet(http.ResponseWriter, *http.Request)
-	ComplexesComplexIdPut(http.ResponseWriter, *http.Request)
-	ComplexesComplexIdDelete(http.ResponseWriter, *http.Request)
+	GetComplexes(http.ResponseWriter, *http.Request)
+	CreateComplex(http.ResponseWriter, *http.Request)
+	GetComplex(http.ResponseWriter, *http.Request)
+	UpdateComplex(http.ResponseWriter, *http.Request)
+	DeleteComplex(http.ResponseWriter, *http.Request)
 }
 // GoalsAPIRouter defines the required methods for binding the api requests to a responses for the GoalsAPI
 // The GoalsAPIRouter implementation should parse necessary information from the http request,
 // pass the data to a GoalsAPIServicer to perform the required actions, then write the service results to the http response.
 type GoalsAPIRouter interface { 
-	GoalsGet(http.ResponseWriter, *http.Request)
-	GoalsPost(http.ResponseWriter, *http.Request)
-	GoalsGoalIdGet(http.ResponseWriter, *http.Request)
-	GoalsGoalIdPut(http.ResponseWriter, *http.Request)
-	GoalsGoalIdDelete(http.ResponseWriter, *http.Request)
+	GetGoals(http.ResponseWriter, *http.Request)
+	CreateGoal(http.ResponseWriter, *http.Request)
+	GetGoal(http.ResponseWriter, *http.Request)
+	UpdateGoal(http.ResponseWriter, *http.Request)
+	DeleteGoal(http.ResponseWriter, *http.Request)
 }
 // HealthAPIRouter defines the required methods for binding the api requests to a responses for the HealthAPI
 // The HealthAPIRouter implementation should parse necessary information from the http request,
 // pass the data to a HealthAPIServicer to perform the required actions, then write the service results to the http response.
 type HealthAPIRouter interface { 
-	PingGet(http.ResponseWriter, *http.Request)
+	Ping(http.ResponseWriter, *http.Request)
 }
 // UserBadgesAPIRouter defines the required methods for binding the api requests to a responses for the UserBadgesAPI
 // The UserBadgesAPIRouter implementation should parse necessary information from the http request,
 // pass the data to a UserBadgesAPIServicer to perform the required actions, then write the service results to the http response.
 type UserBadgesAPIRouter interface { 
-	MeBadgesGet(http.ResponseWriter, *http.Request)
+	GetUserBadges(http.ResponseWriter, *http.Request)
 }
 
 
@@ -71,10 +71,10 @@ type UserBadgesAPIRouter interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type ActionsAPIServicer interface { 
-	ActionsGet(context.Context, int64) (ImplResponse, error)
-	ActionsPost(context.Context, ActionInput) (ImplResponse, error)
-	ActionsActionIdPut(context.Context, int64, ActionUpdateInput) (ImplResponse, error)
-	ActionsActionIdDelete(context.Context, int64) (ImplResponse, error)
+	GetActions(context.Context, int64) (ImplResponse, error)
+	CreateAction(context.Context, ActionInput) (ImplResponse, error)
+	UpdateAction(context.Context, int64, ActionUpdateInput) (ImplResponse, error)
+	DeleteAction(context.Context, int64) (ImplResponse, error)
 }
 
 
@@ -83,7 +83,7 @@ type ActionsAPIServicer interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type BadgesAPIServicer interface { 
-	BadgesGet(context.Context) (ImplResponse, error)
+	GetBadges(context.Context) (ImplResponse, error)
 }
 
 
@@ -92,11 +92,11 @@ type BadgesAPIServicer interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type ComplexesAPIServicer interface { 
-	ComplexesGet(context.Context) (ImplResponse, error)
-	ComplexesPost(context.Context, ComplexInput) (ImplResponse, error)
-	ComplexesComplexIdGet(context.Context, int64) (ImplResponse, error)
-	ComplexesComplexIdPut(context.Context, int64, ComplexInput) (ImplResponse, error)
-	ComplexesComplexIdDelete(context.Context, int64) (ImplResponse, error)
+	GetComplexes(context.Context) (ImplResponse, error)
+	CreateComplex(context.Context, ComplexInput) (ImplResponse, error)
+	GetComplex(context.Context, int64) (ImplResponse, error)
+	UpdateComplex(context.Context, int64, ComplexInput) (ImplResponse, error)
+	DeleteComplex(context.Context, int64) (ImplResponse, error)
 }
 
 
@@ -105,11 +105,11 @@ type ComplexesAPIServicer interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type GoalsAPIServicer interface { 
-	GoalsGet(context.Context) (ImplResponse, error)
-	GoalsPost(context.Context, GoalInput) (ImplResponse, error)
-	GoalsGoalIdGet(context.Context, int64) (ImplResponse, error)
-	GoalsGoalIdPut(context.Context, int64, GoalInput) (ImplResponse, error)
-	GoalsGoalIdDelete(context.Context, int64) (ImplResponse, error)
+	GetGoals(context.Context) (ImplResponse, error)
+	CreateGoal(context.Context, GoalInput) (ImplResponse, error)
+	GetGoal(context.Context, int64) (ImplResponse, error)
+	UpdateGoal(context.Context, int64, GoalInput) (ImplResponse, error)
+	DeleteGoal(context.Context, int64) (ImplResponse, error)
 }
 
 
@@ -118,7 +118,7 @@ type GoalsAPIServicer interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type HealthAPIServicer interface { 
-	PingGet(context.Context) (ImplResponse, error)
+	Ping(context.Context) (ImplResponse, error)
 }
 
 
@@ -127,5 +127,5 @@ type HealthAPIServicer interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type UserBadgesAPIServicer interface { 
-	MeBadgesGet(context.Context) (ImplResponse, error)
+	GetUserBadges(context.Context) (ImplResponse, error)
 }

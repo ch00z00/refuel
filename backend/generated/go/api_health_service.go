@@ -27,13 +27,13 @@ func NewHealthAPIService() *HealthAPIService {
 	return &HealthAPIService{}
 }
 
-// PingGet - サーバーの死活監視
-func (s *HealthAPIService) PingGet(ctx context.Context) (ImplResponse, error) {
-	// TODO - update PingGet with the required logic for this service method.
+// Ping - サーバーの死活監視
+func (s *HealthAPIService) Ping(ctx context.Context) (ImplResponse, error) {
+	// TODO - update Ping with the required logic for this service method.
 	// Add api_health_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	// TODO: Uncomment the next line to return response Response(200, PingGet200Response{}) or use other options such as http.Ok ...
-	// return Response(200, PingGet200Response{}), nil
+	// TODO: Uncomment the next line to return response Response(200, Ping200Response{}) or use other options such as http.Ok ...
+	// return Response(200, Ping200Response{}), nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("PingGet method not implemented")
+	return Response(http.StatusNotImplemented, nil), errors.New("Ping method not implemented")
 }

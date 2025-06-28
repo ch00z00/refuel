@@ -27,9 +27,9 @@ func NewActionsAPIService() *ActionsAPIService {
 	return &ActionsAPIService{}
 }
 
-// ActionsGet - 指定された目標IDに紐づく行動の一覧を取得
-func (s *ActionsAPIService) ActionsGet(ctx context.Context, goalId int64) (ImplResponse, error) {
-	// TODO - update ActionsGet with the required logic for this service method.
+// GetActions - 指定された目標IDに紐づく行動の一覧を取得
+func (s *ActionsAPIService) GetActions(ctx context.Context, goalId int64) (ImplResponse, error) {
+	// TODO - update GetActions with the required logic for this service method.
 	// Add api_actions_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
 	// TODO: Uncomment the next line to return response Response(200, []Action{}) or use other options such as http.Ok ...
@@ -47,12 +47,12 @@ func (s *ActionsAPIService) ActionsGet(ctx context.Context, goalId int64) (ImplR
 	// TODO: Uncomment the next line to return response Response(500, Error{}) or use other options such as http.Ok ...
 	// return Response(500, Error{}), nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("ActionsGet method not implemented")
+	return Response(http.StatusNotImplemented, nil), errors.New("GetActions method not implemented")
 }
 
-// ActionsPost - 新しい行動を記録
-func (s *ActionsAPIService) ActionsPost(ctx context.Context, actionInput ActionInput) (ImplResponse, error) {
-	// TODO - update ActionsPost with the required logic for this service method.
+// CreateAction - 新しい行動を記録
+func (s *ActionsAPIService) CreateAction(ctx context.Context, actionInput ActionInput) (ImplResponse, error) {
+	// TODO - update CreateAction with the required logic for this service method.
 	// Add api_actions_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
 	// TODO: Uncomment the next line to return response Response(201, Action{}) or use other options such as http.Ok ...
@@ -61,12 +61,12 @@ func (s *ActionsAPIService) ActionsPost(ctx context.Context, actionInput ActionI
 	// TODO: Uncomment the next line to return response Response(400, Error{}) or use other options such as http.Ok ...
 	// return Response(400, Error{}), nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("ActionsPost method not implemented")
+	return Response(http.StatusNotImplemented, nil), errors.New("CreateAction method not implemented")
 }
 
-// ActionsActionIdPut - 既存の行動情報を更新
-func (s *ActionsAPIService) ActionsActionIdPut(ctx context.Context, actionId int64, actionUpdateInput ActionUpdateInput) (ImplResponse, error) {
-	// TODO - update ActionsActionIdPut with the required logic for this service method.
+// UpdateAction - 既存の行動情報を更新
+func (s *ActionsAPIService) UpdateAction(ctx context.Context, actionId int64, actionUpdateInput ActionUpdateInput) (ImplResponse, error) {
+	// TODO - update UpdateAction with the required logic for this service method.
 	// Add api_actions_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
 	// TODO: Uncomment the next line to return response Response(200, Action{}) or use other options such as http.Ok ...
@@ -84,12 +84,12 @@ func (s *ActionsAPIService) ActionsActionIdPut(ctx context.Context, actionId int
 	// TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
 	// return Response(500, nil),nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("ActionsActionIdPut method not implemented")
+	return Response(http.StatusNotImplemented, nil), errors.New("UpdateAction method not implemented")
 }
 
-// ActionsActionIdDelete - 既存の行動を削除
-func (s *ActionsAPIService) ActionsActionIdDelete(ctx context.Context, actionId int64) (ImplResponse, error) {
-	// TODO - update ActionsActionIdDelete with the required logic for this service method.
+// DeleteAction - 既存の行動を削除
+func (s *ActionsAPIService) DeleteAction(ctx context.Context, actionId int64) (ImplResponse, error) {
+	// TODO - update DeleteAction with the required logic for this service method.
 	// Add api_actions_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
 	// TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
@@ -104,5 +104,5 @@ func (s *ActionsAPIService) ActionsActionIdDelete(ctx context.Context, actionId 
 	// TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
 	// return Response(500, nil),nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("ActionsActionIdDelete method not implemented")
+	return Response(http.StatusNotImplemented, nil), errors.New("DeleteAction method not implemented")
 }

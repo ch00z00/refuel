@@ -9,31 +9,35 @@ servers:
 - description: Development server
   url: http://localhost:8080/api/v1
 tags:
-- description: Operations related to user complexes
+- description: コンプレックスに関する操作
   name: Complexes
-- description: Operations related to user goals
+- description: 目標に関する操作
   name: Goals
-- description: Operations related to user actions
+- description: 行動に関する操作
   name: Actions
-- description: Operations related to badges
+- description: バッジに関する操作
   name: Badges
-- description: API health check
+- description: ユーザーが獲得したバッジに関する操作
+  name: UserBadges
+- description: APIのヘルスチェック
   name: Health
 paths:
   /ping:
     get:
+      operationId: ping
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/_ping_get_200_response'
+                $ref: '#/components/schemas/ping_200_response'
           description: Success response
       summary: サーバーの死活監視
       tags:
       - Health
   /complexes:
     get:
+      operationId: getComplexes
       responses:
         "200":
           content:
@@ -61,6 +65,7 @@ paths:
       tags:
       - Complexes
     post:
+      operationId: createComplex
       requestBody:
         content:
           application/json:
@@ -93,6 +98,7 @@ paths:
       - Complexes
   /complexes/{complexId}:
     delete:
+      operationId: deleteComplex
       parameters:
       - description: 操作対象のコンプレックスID
         explode: false
@@ -125,6 +131,7 @@ paths:
       tags:
       - Complexes
     get:
+      operationId: getComplex
       parameters:
       - description: 操作対象のコンプレックスID
         explode: false
@@ -172,6 +179,7 @@ paths:
         type: integer
       style: simple
     put:
+      operationId: updateComplex
       parameters:
       - description: 操作対象のコンプレックスID
         explode: false
@@ -221,6 +229,7 @@ paths:
       - Complexes
   /goals:
     get:
+      operationId: getGoals
       responses:
         "200":
           content:
@@ -248,6 +257,7 @@ paths:
       tags:
       - Goals
     post:
+      operationId: createGoal
       requestBody:
         content:
           application/json:
@@ -286,6 +296,7 @@ paths:
       - Goals
   /goals/{goalId}:
     delete:
+      operationId: deleteGoal
       parameters:
       - description: 操作対象の目標ID
         explode: false
@@ -316,6 +327,7 @@ paths:
       tags:
       - Goals
     get:
+      operationId: getGoal
       parameters:
       - description: 操作対象の目標ID
         explode: false
@@ -361,6 +373,7 @@ paths:
         type: integer
       style: simple
     put:
+      operationId: updateGoal
       parameters:
       - description: 操作対象の目標ID
         explode: false
@@ -408,6 +421,7 @@ paths:
       - Goals
   /actions:
     get:
+      operationId: getActions
       parameters:
       - description: 行動を取得する対象の目標ID
         explode: true
@@ -454,6 +468,7 @@ paths:
       tags:
       - Actions
     post:
+      operationId: createAction
       requestBody:
         content:
           application/json:
@@ -480,6 +495,7 @@ paths:
       - Actions
   /actions/{actionId}:
     delete:
+      operationId: deleteAction
       parameters:
       - description: 操作対象の行動ID
         explode: false
@@ -517,6 +533,7 @@ paths:
         type: integer
       style: simple
     put:
+      operationId: updateAction
       parameters:
       - description: 操作対象の行動ID
         explode: false
@@ -564,6 +581,7 @@ paths:
       - Actions
   /badges:
     get:
+      operationId: getBadges
       responses:
         "200":
           content:
@@ -586,6 +604,7 @@ paths:
       - Badges
   /me/badges:
     get:
+      operationId: getUserBadges
       responses:
         "200":
           content:
@@ -1090,7 +1109,7 @@ components:
       - achieved_at
       - badge
       - user_id
-    _ping_get_200_response:
+    ping_200_response:
       example:
         message: pong
       properties:

@@ -48,17 +48,17 @@ func NewHealthAPIController(s HealthAPIServicer, opts ...HealthAPIOption) *Healt
 // Routes returns all the api routes for the HealthAPIController
 func (c *HealthAPIController) Routes() Routes {
 	return Routes{
-		"PingGet": Route{
+		"Ping": Route{
 			strings.ToUpper("Get"),
 			"/api/v1/ping",
-			c.PingGet,
+			c.Ping,
 		},
 	}
 }
 
-// PingGet - サーバーの死活監視
-func (c *HealthAPIController) PingGet(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.PingGet(r.Context())
+// Ping - サーバーの死活監視
+func (c *HealthAPIController) Ping(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.Ping(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
