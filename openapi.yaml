@@ -414,17 +414,17 @@ components:
 
 tags:
  - name: Complexes
-   description: Operations related to user complexes
+   description: コンプレックスに関する操作
  - name: Goals
-   description: Operations related to user goals
+   description: 目標に関する操作
  - name: Actions
-   description: Operations related to user actions
+   description: 行動に関する操作
  - name: Badges
-   description: Operations related to badges
+   description: バッジに関する操作
  - name: UserBadges
-   description: Operations related to a user's earned badges
+   description: ユーザーが獲得したバッジに関する操作
  - name: Health
-   description: API health check
+   description: APIのヘルスチェック
 
 paths:
  /ping:
