@@ -25,35 +25,35 @@ import (
 func main() {
 	log.Printf("Server started")
 
-	// 1. Ginルーターを初期化
+	// 1. Initialize Gin router
 	ginRouter := gin.Default()
 
-	// 2. アプリケーションコンテキスト（DB接続、バリデーターなど）をセットアップ
+	// 2. Setup application context (DB connection, validator, etc.)
 	appCtx, err := app.SetupApp()
 	if err != nil {
 		log.Fatalf("Failed to setup application: %v", err)
 	}
 
-	// 3. ビジネスロジックを実装したAPIサービスをインスタンス化
+	// 3. Instantiate API service with business logic
 	apiService := app.NewAPIService(appCtx.DB, appCtx.Validate)
 
-	// 4. 生成されたコントローラーにAPIサービスを渡し、ルーターに登録
+	// 4. Pass API service to generated controller and register to router
 	router := refuelapi.NewRouter(
-		refuelapi.NewActionsAPIController(apiService),
-		refuelapi.NewBadgesAPIController(apiService),
-		refuelapi.NewComplexesAPIController(apiService),
-		refuelapi.NewGoalsAPIController(apiService),
-		refuelapi.NewHealthAPIController(apiService),
-		refuelapi.NewUserBadgesAPIController(apiService),
+		refuelapi.NewActionsAPIController(apiService.(refuelapi.ActionsAPIServicer)),
+		refuelapi.NewBadgesAPIController(apiService.(refuelapi.BadgesAPIServicer)),
+		refuelapi.NewComplexesAPIController(apiService.(refuelapi.ComplexesAPIServicer)),
+		refuelapi.NewGoalsAPIController(apiService.(refuelapi.GoalsAPIServicer)),
+		refuelapi.NewHealthAPIController(apiService.(refuelapi.HealthAPIServicer)),
+		refuelapi.NewUserBadgesAPIController(apiService.(refuelapi.UserBadgesAPIServicer)),
 	)
 
-	// 5. Ginミドルウェア（CORS, Authなど）を設定
+	// 5. Setup Gin middleware (CORS, Auth, etc.)
 	app.SetupGinMiddlewares(ginRouter)
 
-	// 6. 生成されたルーターのハンドラをGinルーターに登録
-	//    openapi-generatorが生成したルーターはhttp.Handlerインターフェースを実装している
+	// 6. Register generated router handler to Gin router
+	//    openapi-generator generated router implements http.Handler interface
 	ginRouter.Any("/*any", gin.WrapH(router))
 
-	// 7. サーバーを起動
+	// 7. Start server
 	log.Fatal(http.ListenAndServe(":8080", ginRouter))
 }

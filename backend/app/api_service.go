@@ -60,7 +60,7 @@ func GetUserIDFromContext(ctx context.Context) (string, *refuelapi.ImplResponse)
 // --- API Service Implementations ---
 
 // CreateAction implements the ActionsAPIServicer interface.
-func (s *APIService) CreateAction(ctx context.Context, actionInput refuelapi.ActionInput) (refuelapi.ImplResponse) {
+func (s APIService) CreateAction(ctx context.Context, actionInput refuelapi.ActionInput) (refuelapi.ImplResponse) {
     userID, resp := GetUserIDFromContext(ctx)
     if resp != nil {
         return *resp
@@ -134,7 +134,7 @@ func (s *APIService) CreateAction(ctx context.Context, actionInput refuelapi.Act
 }
 
 // DeleteAction - 既存の行動を削除
-func (s *APIService) DeleteAction(ctx context.Context, actionId int64) (refuelapi.ImplResponse) {
+func (s APIService) DeleteAction(ctx context.Context, actionId int64) (refuelapi.ImplResponse) {
     userID, resp := GetUserIDFromContext(ctx)
     if resp != nil {
         return *resp
@@ -147,7 +147,7 @@ func (s *APIService) DeleteAction(ctx context.Context, actionId int64) (refuelap
 }
 
 // GetActions - 指定された目標IDに紐づく行動の一覧を取得
-func (s *APIService) GetActions(ctx context.Context, goalId int64) (refuelapi.ImplResponse) {
+func (s APIService) GetActions(ctx context.Context, goalId int64) (refuelapi.ImplResponse) {
     userID, resp := GetUserIDFromContext(ctx)
     if resp != nil {
         return *resp
@@ -192,7 +192,7 @@ func (s *APIService) GetActions(ctx context.Context, goalId int64) (refuelapi.Im
 }
 
 // UpdateAction - 既存の行動情報を更新
-func (s *APIService) UpdateAction(ctx context.Context, actionId int64, actionUpdateInput refuelapi.ActionUpdateInput) (refuelapi.ImplResponse) {
+func (s APIService) UpdateAction(ctx context.Context, actionId int64, actionUpdateInput refuelapi.ActionUpdateInput) (refuelapi.ImplResponse) {
     userID, resp := GetUserIDFromContext(ctx)
     if resp != nil {
         return *resp
@@ -246,19 +246,19 @@ func (s *APIService) UpdateAction(ctx context.Context, actionId int64, actionUpd
 }
 
 // GetBadges - 利用可能なバッジの一覧を取得
-func (s *APIService) GetBadges(ctx context.Context) (refuelapi.ImplResponse) {
+func (s APIService) GetBadges(ctx context.Context) (refuelapi.ImplResponse) {
 	// TODO - implement GetBadges
 	return refuelapi.ImplResponse{Code: http.StatusNotImplemented}
 }
 
 // GetUserBadges - 認証ユーザーが獲得したバッジの一覧を取得
-func (s *APIService) GetUserBadges(ctx context.Context) (refuelapi.ImplResponse) {
+func (s APIService) GetUserBadges(ctx context.Context) (refuelapi.ImplResponse) {
 	// TODO - implement GetUserBadges
 	return refuelapi.ImplResponse{Code: http.StatusNotImplemented}
 }
 
 // GetComplexes - 登録されているコンプレックスの一覧を取得
-func (s *APIService) GetComplexes(ctx context.Context) (refuelapi.ImplResponse) {
+func (s APIService) GetComplexes(ctx context.Context) (refuelapi.ImplResponse) {
     userID, resp := GetUserIDFromContext(ctx)
     if resp != nil {
         return *resp
@@ -291,7 +291,7 @@ func (s *APIService) GetComplexes(ctx context.Context) (refuelapi.ImplResponse) 
 }
 
 // CreateComplex - 新しいコンプレックスを登録
-func (s *APIService) CreateComplex(ctx context.Context, complexInput refuelapi.ComplexInput) (refuelapi.ImplResponse) {
+func (s APIService) CreateComplex(ctx context.Context, complexInput refuelapi.ComplexInput) (refuelapi.ImplResponse) {
     userID, resp := GetUserIDFromContext(ctx)
     if resp != nil {
         return *resp
@@ -340,7 +340,7 @@ func (s *APIService) CreateComplex(ctx context.Context, complexInput refuelapi.C
 }
 
 // DeleteComplex - 既存のコンプレックスを削除
-func (s *APIService) DeleteComplex(ctx context.Context, complexId int64) (refuelapi.ImplResponse) {
+func (s APIService) DeleteComplex(ctx context.Context, complexId int64) (refuelapi.ImplResponse) {
     userID, resp := GetUserIDFromContext(ctx)
     if resp != nil {
         return *resp
@@ -353,7 +353,7 @@ func (s *APIService) DeleteComplex(ctx context.Context, complexId int64) (refuel
 }
 
 // GetComplex - 指定されたIDのコンプレックス情報を取得します。
-func (s *APIService) GetComplex(ctx context.Context, complexId int64) (refuelapi.ImplResponse) {
+func (s APIService) GetComplex(ctx context.Context, complexId int64) (refuelapi.ImplResponse) {
     userID, resp := GetUserIDFromContext(ctx)
     if resp != nil {
         return *resp
@@ -384,7 +384,7 @@ func (s *APIService) GetComplex(ctx context.Context, complexId int64) (refuelapi
 }
 
 // UpdateComplex - 既存のコンプレックス情報を更新します。
-func (s *APIService) UpdateComplex(ctx context.Context, complexId int64, complexInput refuelapi.ComplexInput) (refuelapi.ImplResponse) {
+func (s APIService) UpdateComplex(ctx context.Context, complexId int64, complexInput refuelapi.ComplexInput) (refuelapi.ImplResponse) {
     userID, resp := GetUserIDFromContext(ctx)
     if resp != nil {
         return *resp
@@ -428,7 +428,7 @@ func (s *APIService) UpdateComplex(ctx context.Context, complexId int64, complex
 }
 
 // CreateGoal - 新しい目標を登録
-func (s *APIService) CreateGoal(ctx context.Context, goalInput refuelapi.GoalInput) (refuelapi.ImplResponse) {
+func (s APIService) CreateGoal(ctx context.Context, goalInput refuelapi.GoalInput) (refuelapi.ImplResponse) {
     userID, resp := GetUserIDFromContext(ctx)
     if resp != nil {
         return *resp
@@ -470,7 +470,7 @@ func (s *APIService) CreateGoal(ctx context.Context, goalInput refuelapi.GoalInp
 }
 
 // DeleteGoal - 既存の目標を削除
-func (s *APIService) DeleteGoal(ctx context.Context, goalId int64) (refuelapi.ImplResponse) {
+func (s APIService) DeleteGoal(ctx context.Context, goalId int64) (refuelapi.ImplResponse) {
     userID, resp := GetUserIDFromContext(ctx)
     if resp != nil {
         return *resp
@@ -483,7 +483,7 @@ func (s *APIService) DeleteGoal(ctx context.Context, goalId int64) (refuelapi.Im
 }
 
 // GetGoal - 指定されたIDの目標情報を取得
-func (s *APIService) GetGoal(ctx context.Context, goalId int64) (refuelapi.ImplResponse) {
+func (s APIService) GetGoal(ctx context.Context, goalId int64) (refuelapi.ImplResponse) {
     userID, resp := GetUserIDFromContext(ctx)
     if resp != nil {
         return *resp
@@ -510,7 +510,7 @@ func (s *APIService) GetGoal(ctx context.Context, goalId int64) (refuelapi.ImplR
 }
 
 // GetGoals - 登録されている目標の一覧を取得
-func (s *APIService) GetGoals(ctx context.Context) (refuelapi.ImplResponse) {
+func (s APIService) GetGoals(ctx context.Context) (refuelapi.ImplResponse) {
     userID, resp := GetUserIDFromContext(ctx)
     if resp != nil {
         return *resp
@@ -541,7 +541,7 @@ func (s *APIService) GetGoals(ctx context.Context) (refuelapi.ImplResponse) {
 }
 
 // UpdateGoal - 既存の目標情報を更新
-func (s *APIService) UpdateGoal(ctx context.Context, goalId int64, goalInput refuelapi.GoalInput) (refuelapi.ImplResponse) {
+func (s APIService) UpdateGoal(ctx context.Context, goalId int64, goalInput refuelapi.GoalInput) (refuelapi.ImplResponse) {
     userID, resp := GetUserIDFromContext(ctx)
     if resp != nil {
         return *resp
@@ -575,6 +575,6 @@ func (s *APIService) UpdateGoal(ctx context.Context, goalId int64, goalInput ref
 }
 
 // Ping - サーバーの死活監視
-func (s *APIService) Ping(ctx context.Context) (refuelapi.ImplResponse) {
+func (s APIService) Ping(ctx context.Context) (refuelapi.ImplResponse) {
     return refuelapi.ImplResponse{Code: http.StatusOK, Body: map[string]string{"message": "pong"}}
 }
